@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta property="og:title" content="{{imageTitle}}" />
     <meta property="og:description" content="{{imageDescription}}" />
-    <meta property="og:image" content="{{imageUrl}}" />
+    <meta property="og:image" content="data:{{imageContentType}};base64,{{imageData}}" />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
     <meta property="og:url" content="{{pageUrl}}" />
@@ -23,36 +23,9 @@
     <title>{{imageTitle}}</title>
   </head>
   <body>
-    <div
-      style="
-        max-width: 600px;
-        margin: 20px auto;
-        text-align: center;
-        border: 1px solid #ccc;
-        padding: 20px;
-        background-color: #f8f8f8;
-      "
-    >
-      <img
-        src="{{imageUrl}}"
-        alt="{{imageTitle}}"
-        style="max-width: 100%; height: auto; border-radius: 10px"
-      />
-
-      <h2 style="margin-top: 10px; color: #333">{{imageTitle}}</h2>
-
-      <p style="color: #666">{{imageDescription}}</p>
-    </div>
-
-    <footer
-      style="
-        text-align: center;
-        padding: 10px;
-        background-color: #333;
-        color: #fff;
-      "
-    >
-      <p>&copy; 2024 Seu Nome. Todos os direitos reservados.</p>
-    </footer>
+    <img
+      src="data:{{imageContentType}};base64,{{imageData}}"
+      alt="{{imageId}}"
+    />
   </body>
 </html>
