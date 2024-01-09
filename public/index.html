@@ -1,20 +1,58 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="pt-br">
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta property="og:title" content="{{imageTitle}}" />
     <meta property="og:description" content="{{imageDescription}}" />
     <meta property="og:image" content="{{imageUrl}}" />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
-    <meta property="og:url" content="{{imageUrl}}" />
-    <meta name="twitter:card" content="summary_large_image">
-    <meta property="og:footer" content="Ryu©. Todos os direitos reservados." />
+    <meta property="og:url" content="{{pageUrl}}" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="pt_BR" />
+    <meta property="og:site_name" content="Seu Site" />
+    <meta
+      property="og:footer"
+      content="© 2024 Seu Nome. Todos os direitos reservados."
+    />
+    <meta property="article:author" content="https://www.seusite.com/autor" />
+    <meta property="article:published_time" content="2024-01-09T12:34:56Z" />
     <title>{{imageTitle}}</title>
-</head>
-<body>
-    <!-- Conteúdo da sua página aqui -->
-</body>
+  </head>
+  <body>
+    <div
+      style="
+        max-width: 600px;
+        margin: 20px auto;
+        text-align: center;
+        border: 1px solid #ccc;
+        padding: 20px;
+        background-color: #f8f8f8;
+      "
+    >
+      <img
+        src="{{imageUrl}}"
+        alt="{{imageTitle}}"
+        style="max-width: 100%; height: auto; border-radius: 10px"
+      />
+
+      <h2 style="margin-top: 10px; color: #333">{{imageTitle}}</h2>
+
+      <p style="color: #666">{{imageDescription}}</p>
+    </div>
+
+    <footer
+      style="
+        text-align: center;
+        padding: 10px;
+        background-color: #333;
+        color: #fff;
+      "
+    >
+      <p>&copy; 2024 Seu Nome. Todos os direitos reservados.</p>
+    </footer>
+  </body>
 </html>
