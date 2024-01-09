@@ -73,8 +73,8 @@ export class RyuPics {
     private loadRoutes(): Array<Route> {
         const routes: Array<Route> = [
             { method: 'GET', path: '/', handler: HomeController.index },
-            { method: 'POST', path: '/upload', handler: UploaderController.handleUpload },
-            { method: 'GET', path: '/image/:id', handler: ImageController.getImageDataById }
+            { method: 'GET', path: '/image/:id', handler: ImageController.getImageDataById },
+            { method: 'POST', path: '/upload', handler: UploaderController.handleUpload }
         ];
 
         return routes;
