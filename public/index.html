@@ -1,63 +1,34 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!doctype html>
+<html lang="pt-br">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta property="og:title" content="{{imageTitle}}" />
     <meta property="og:description" content="{{imageDescription}}" />
     <meta property="og:image" content="{{imageUrl}}" />
     <title>Embed Bonita</title>
-    <style>
-        body {
-            font-family: 'Arial', sans-serif;
-            background-color: #f0f0f0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-        }
+  </head>
+  <body>
+    <div
+      style="
+        max-width: 600px;
+        margin: 20px auto;
+        text-align: center;
+        border: 1px solid #ccc;
+        padding: 20px;
+        background-color: #f8f8f8;
+      "
+    >
+      <img
+        src="{{imageUrl}}"
+        alt="{{imageTitle}}"
+        style="max-width: 100%; height: auto; border-radius: 10px"
+      />
 
-        .embed-container {
-            max-width: 400px;
-            background-color: #fff;
-            border-radius: 10px;
-            overflow: hidden;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        }
+      <h2 style="margin-top: 10px; color: #333">{{imageTitle}}</h2>
 
-        .embed-image {
-            width: 100%;
-            height: auto;
-            max-height: 200px;
-            object-fit: cover;
-        }
-
-        .embed-content {
-            padding: 20px;
-        }
-
-        .embed-title {
-            font-size: 1.5em;
-            font-weight: bold;
-            margin-bottom: 10px;
-        }
-
-        .embed-description {
-            font-size: 1em;
-            color: #666;
-        }
-    </style>
-</head>
-<body>
-
-<div class="embed-container">
-    <img class="embed-image" src="{{imageUrl}}" alt="Embedded Image">
-    <div class="embed-content">
-        <div class="embed-title">{{imageTitle}}</div>
-        <div class="embed-description">{{imageDescription}}</div>
+      <p style="color: #666">{{imageDescription}}</p>
     </div>
-</div>
-
-</body>
+  </body>
 </html>
