@@ -1,7 +1,5 @@
 import { Request, Response } from 'express';
-import { readFileSync } from 'fs';
 import { ObjectId } from 'mongodb';
-import { join } from 'path';
 
 class ImageController {
     static getImageDataById = async (
@@ -17,17 +15,10 @@ class ImageController {
             const image = await collection.findOne({ _id: new ObjectId(imageId) });
 
             if (image) {
-                const htmlTemplate = readFileSync(join(__dirname, '../../../', 'public', 'index.html'), 'utf-8');
+                const buffer = Buffer.from(image.data, 'base64');
+                res.setHeader('Content-Type', image.contentType);
 
-                const html = htmlTemplate
-                    .replace('{{imageId}}', imageId)
-                    .replace('{{imageTitle}}', 'Título da Imagem')
-                    .replace('{{imageDescription}}', 'Descrição da Imagem')
-                    .replace('{{imageUrl}}', `${process.env.STATE == 'development' ? `${process.env.LOCAL_URL}:${process.env.PORT}/image/${imageId}` : `${process.env.DOMAIN_URL}/image/${imageId}`}`)
-                    .replace('{{imageContentType}}', image.contentType)
-                    .replace('{{imageData}}', image.data.toString('base64'));
-
-                res.send(html);
+                res.send(buffer);
             } else {
                 return res.status(404).json({ code: '404', message: 'Image not found' });
             }
