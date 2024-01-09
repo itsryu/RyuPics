@@ -5,6 +5,7 @@ import { ErrorController, HomeController, ImageController, UploaderController } 
 import { config } from 'dotenv';
 import { Route } from './types/HTTPInterfaces';
 import { Logger } from './utils/util';
+import { join } from 'path';
 config({ path: './.env' });
 
 export class RyuPics {
@@ -41,6 +42,8 @@ export class RyuPics {
     }
 
     private config(): void {
+        this.app.set('view engine', 'ejs');
+        this.app.set('views', join(__dirname, '../../', 'views'));
         this.app.use(express.json());
         this.app.use(express.urlencoded({ extended: true }));
         this.app.use(this.initRoutes());

@@ -19,6 +19,10 @@ class ImageController {
                 res.setHeader('Content-Type', image.contentType);
 
                 res.send(buffer);
+
+                res.render('index', { pageTitle: imageId, ogData: {
+                    image:`data:${image.contentType};base64,${buffer.toString('base64')}`
+                }});
             } else {
                 return res.status(404).json({ code: '404', message: 'Image not found' });
             }
