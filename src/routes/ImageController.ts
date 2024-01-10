@@ -33,8 +33,8 @@ class ImageController {
             writeFileSync(filePath, buffer);
 
             const fileLink = (process.env.STATE === 'development')
-                ? `${process.env.LOCAL_URL}:${process.env.PORT}/temp/${fileName}`
-                : `${process.env.DOMAIN_URL}/temp/${fileName}`;
+                ? `${process.env.LOCAL_URL}:${process.env.PORT}/.temp/${fileName}`
+                : `${process.env.DOMAIN_URL}/.temp/${fileName}`;
 
             const uploads = await collection.countDocuments();
             res.render('index', { title: imageId, image: fileLink, uploads, date: new Date() });
