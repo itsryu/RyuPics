@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
-import { existsSync, mkdirSync, writeFileSync } from 'fs';
+import { existsSync, writeFileSync } from 'fs';
+import { mkdir } from 'fs/promises';
 import { ObjectId } from 'mongodb';
 import { join } from 'path';
 
@@ -16,32 +17,30 @@ class ImageController {
             const imageId = req.params.id;
             const image = await collection.findOne({ _id: new ObjectId(imageId) });
 
-            if (image) {
-                const buffer = Buffer.from(image.data, 'base64');
-                const tempDir = join(__dirname, '../../../', 'public', 'temp');
-
-                // Certifique-se de que o diretório temporário exista
-                if (!existsSync(tempDir)) {
-                    mkdirSync(tempDir);
-                }
-
-                const fileName = `${imageId}.png`;
-                const filePath = join(tempDir, fileName);
-
-                writeFileSync(filePath, buffer);
-
-                const fileLink = process.env.STATE == 'development' ? `${process.env.LOCAL_URL}:${process.env.PORT}/temp/${fileName}` : `${process.env.DOMAIN_URL}/temp/${fileName}`;
-
-                console.log('Arquivo temporário salvo em:', filePath);
-                console.log('Link para o arquivo:', fileLink);
-
-                res.render('index', { title: imageId, image: fileLink, uploads: collection.countDocuments(), date: new Date() });
-            } else {
+            if (!image) {
                 return res.status(404).json({ code: '404', message: 'Image not found' });
             }
-        } catch (err) {
-            console.log(err);
-            res.status(500).json({ code: '500', message: 'Incorrect imageId format' });
+
+            const buffer = Buffer.from(image.data, 'base64');
+            const tempDir = join(__dirname, '../../../', 'public', '.temp');
+            const fileName = `${imageId}.png`;
+            const filePath = join(tempDir, fileName);
+
+            if (!existsSync(tempDir)) {
+                await mkdir(tempDir, { recursive: true });
+            }
+
+            writeFileSync(filePath, buffer);
+
+            const fileLink = (process.env.STATE === 'development')
+                ? `${process.env.LOCAL_URL}:${process.env.PORT}/temp/${fileName}`
+                : `${process.env.DOMAIN_URL}/temp/${fileName}`;
+
+            const uploads = await collection.countDocuments();
+            res.render('index', { title: imageId, image: fileLink, uploads, date: new Date() });
+        } catch (error) {
+            console.error('Error processing image request:', error);
+            res.status(500).json({ code: '500', message: 'Internal Server Error' });
         }
     };
 }
