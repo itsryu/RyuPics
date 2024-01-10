@@ -1,9 +1,9 @@
-import { Request, Response, NextFunction } from 'express';
+import { Request, Response } from 'express';
 import { HttpError } from '../structs/RouteStructure';
 
 class ErrorController {
-    static notFound(req: Request, res: Response, next: NextFunction) {
-        next(new HttpError(404, 'Rota não encontrada'));
+    static notFound(req: Request, res: Response) {
+        res.send(new HttpError(404, 'Rota não encontrada'));
     }
 }
 
