@@ -47,6 +47,7 @@ export class RyuPics {
     private config(): void {
         this.app.set('view engine', 'ejs');
         this.app.set('views', join(__dirname, '../../', 'views'));
+        this.app.use(express.static(join(__dirname, '../../', 'public')));
         this.app.use(express.json());
         this.app.use(express.urlencoded({ extended: true }));
         this.app.use(this.initRoutes());
