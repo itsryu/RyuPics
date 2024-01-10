@@ -40,6 +40,7 @@ class ImageController {
                 return res.status(404).json({ code: '404', message: 'Image not found' });
             }
         } catch (err) {
+            console.log(err);
             res.status(500).json({ code: '500', message: 'Incorrect imageId format' });
         }
     };
