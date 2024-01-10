@@ -10,7 +10,8 @@
   },
   "scripts": {
     "build": "npx tsc --project tsconfig.json --pretty --noEmitOnError && echo Arquivos compilados com sucesso!",
-    "clean": "rmdir /s /q dist",
+    "clean-win": "rmdir /s /q dist",
+    "clean-lin": "rm -r dist",
     "start": "node dist/launcher.js",
     "dev": "nodemon --watch . --ext js,ts,ejs,css --exec ts-node src/server.ts",
     "lint": "eslint . --ext .ts",

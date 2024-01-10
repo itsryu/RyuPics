@@ -16,9 +16,10 @@ class ImageController {
 
             if (image) {
                 const buffer = Buffer.from(image.data, 'base64');
-                res.setHeader('Content-Type', image.contentType);
 
+                res.setHeader('Content-Type', image.contentType);
                 res.send(buffer);
+                res.render('index', { title: imageId, image: `https://pics.ryuzaki.cloud/image/${imageId}`});
             } else {
                 return res.status(404).json({ code: '404', message: 'Image not found' });
             }

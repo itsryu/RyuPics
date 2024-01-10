@@ -39,6 +39,9 @@ export class RyuPics {
         });
 
         this.config();
+
+        process.on('uncaughtException', (err: Error) => this.logger.error(err.stack as string, 'uncaughtException'));
+        process.on('unhandledRejection', (err) => this.logger.error(err as string, 'unhandledRejection'));
     }
 
     private config(): void {
