@@ -10,7 +10,7 @@ class InfoMiddleware extends RouteStructure{
     run = (req: Request, res: Response, next: NextFunction) => {
         const ip = req.headers['x-forwarded-for'];
 
-        this.client.logger.info(`\nRoute: ${req.originalUrl}\nMethod: ${req.method}\nIP: ${ip}`, InfoMiddleware.name);
+        if (ip) this.client.logger.info(`\nRoute: ${req.originalUrl}\nMethod: ${req.method}\nIP: ${ip}`, InfoMiddleware.name);
         
         return next();
     };
