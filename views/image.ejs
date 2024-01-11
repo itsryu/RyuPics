@@ -29,4 +29,22 @@
   <body>
     <img src="<%= image %>" alt="<%= title %>" />
   </body>
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      const imageId = "<%- title %>";
+
+      window.addEventListener("beforeunload", function () {
+        fetch(`/delete/${imageId}`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ imageId }),
+        })
+          .then((response) => response.text())
+          .then((data) => console.log(data))
+          .catch((error) => console.error("Error:", error));
+      });
+    });
+  </script>
 </html>

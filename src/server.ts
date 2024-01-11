@@ -8,6 +8,8 @@ import { Logger } from './utils/util';
 import { join } from 'path';
 import cors from 'cors';
 import { KeyController } from './routes/KeyController';
+import { InfoMiddleware } from './routes/InfoMiddleware';
+import { DeleteImageController } from './routes/DeleteImageController';
 config({ path: './.env' });
 
 export class RyuPics {
@@ -17,7 +19,7 @@ export class RyuPics {
     multer: Multer = multer({ storage: this.storage });
     database: MongoClient;
     state!: string;
-    
+
     constructor(state: string) {
         this.state = state;
 
@@ -63,14 +65,22 @@ export class RyuPics {
             const { method, path, handler } = route;
 
             switch (method) {
-                case 'GET':
-                    router.get(path, handler.run);
+                case 'GET': {
+                    router.get(path, new InfoMiddleware(this).run, handler.run);
                     break;
-                case 'POST':
-                    router.post(path, new KeyController(this).run, this.multer.single('file'), handler.run);
+                }
+                case 'POST': {
+                    if (path.includes('/upload')) {
+                        router.post(path, new InfoMiddleware(this).run, new KeyController(this).run, this.multer.single('file'), handler.run);
+                    } else {
+                        router.post(path, new InfoMiddleware(this).run, handler.run);
+                    }
+
                     break;
-                default:
+                }
+                default: {
                     break;
+                }
             }
         });
 
@@ -83,6 +93,7 @@ export class RyuPics {
         const routes: Array<Route> = [
             { method: 'GET', path: '/', handler: new HomeController(this) },
             { method: 'GET', path: '/image/:id', handler: new ImageController(this) },
+            { method: 'POST', path: '/delete/:id', handler: new DeleteImageController(this) },
             { method: 'POST', path: '/upload', handler: new UploaderController(this) }
         ];
 

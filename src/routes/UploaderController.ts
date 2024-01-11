@@ -15,8 +15,6 @@ class UploaderController extends RouteStructure {
         const discordString = '||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​|| ‌‌';
 
         try {
-            const ip = req.headers['x-forwarded-for'];
-
             const result = await collection.insertOne({
                 data: req.file?.buffer.toString('base64'),
                 contentType: req.file?.mimetype
@@ -25,8 +23,6 @@ class UploaderController extends RouteStructure {
             const URL = (this.client.state == 'development')
                 ? `${discordString}${process.env.LOCAL_URL}:${process.env.PORT}/image/${result.insertedId}`
                 : `${discordString}${process.env.DOMAIN_URL}/image/${result.insertedId}`;
-
-            this.client.logger.info(`Valid authorization key used:\nRoute: ${req.originalUrl}\nMethod: ${req.method}\nIP: ${ip}\nKey: ${process.env.AUTH_KEY}`, UploaderController.name);
 
             return res.status(200).send(URL);
         } catch (err) {

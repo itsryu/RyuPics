@@ -8,13 +8,15 @@ class KeyController extends RouteStructure {
     }
 
     run = (req: Request, res: Response, next: NextFunction) => {
-        const ip = req.headers['x-forwarded-for'];
         const userKey = req.headers['auth'];
 
-        if (userKey && userKey == process.env.AUTH_KEY) {
+        if (!userKey) return res.status(401).json({ error: 'Chave de autorização não fornecida.' });
+
+        if (userKey && userKey === process.env.AUTH_KEY) {
+            this.client.logger.info(`Valid authorization key used: ${userKey}`, KeyController.name);
             return next();
         } else {
-            this.client.logger.warn(`Invalid authorization key used: \nRoute: ${req.originalUrl}\nMethod: ${req.method}\nIP: ${ip}\nKey: ${userKey}`, KeyController.name);
+            this.client.logger.warn(`Invalid authorization key used: ${userKey}`, KeyController.name);
 
             return res.status(401).json({ error: 'Chave de autorização inválida.' });
         }

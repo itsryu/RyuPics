@@ -24,6 +24,7 @@
         "@typescript-eslint/ban-ts-comment": "off",
         "@typescript-eslint/require-await": "error",
         "@typescript-eslint/no-use-before-define": "off",
+        "@typescript-eslint/no-var-requires": "off",
         "no-empty-function": "off",
         "@typescript-eslint/no-empty-function": [
             "error",

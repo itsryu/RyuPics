@@ -1,7 +1,9 @@
 {
-    "title": "Title Field",
-    "author_name": "Author Name Field",
-    "author_url": "https://discordapp.com",
-    "provider_name": "Provider Name Field",
-    "provider_url": "https://discordapp.com"
-}
+    "version": "1.0",
+    "type": "link",
+    "title": "",
+    "author_name": "Ryu",
+    "author_url": "https://ryuzaki.cloud/",
+    "provider_name": "📸 ✦ 13934 uploads",
+    "provider_url": "https://pics.ryuzaki.cloud/"
+  }
