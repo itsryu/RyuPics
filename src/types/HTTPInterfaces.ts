@@ -1,9 +1,9 @@
-import { RequestHandler } from 'express';
+import { RouteStructure } from '../structs/RouteStructure';
 
 interface Route {
     method: HttpMethod;
     path: string;
-    handler: RequestHandler
+    handler: RouteStructure;
 }
 
 type HttpMethod = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH' | 'OPTIONS' | 'HEAD'

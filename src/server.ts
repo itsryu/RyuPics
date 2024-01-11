@@ -6,20 +6,22 @@ import { config } from 'dotenv';
 import { Route } from './types/HTTPInterfaces';
 import { Logger } from './utils/util';
 import { join } from 'path';
+import cors from 'cors';
+import { KeyController } from './routes/KeyController';
 config({ path: './.env' });
 
 export class RyuPics {
     app: Express = express();
-    storage: StorageEngine = multer.memoryStorage();
-    upload: Multer = multer({ storage: this.storage });
-    client: MongoClient;
-    state!: string;
     logger: Logger = new Logger();
-
+    storage: StorageEngine = multer.memoryStorage();
+    multer: Multer = multer({ storage: this.storage });
+    database: MongoClient;
+    state!: string;
+    
     constructor(state: string) {
         this.state = state;
 
-        this.client = new MongoClient(process.env.MONGODB_URI, {
+        this.database = new MongoClient(process.env.MONGODB_URI, {
             serverApi: {
                 version: ServerApiVersion.v1,
                 strict: true,
@@ -29,8 +31,8 @@ export class RyuPics {
 
         this.app.use(async (req: Request, res: Response, next: NextFunction) => {
             try {
-                await this.client.connect();
-                req.dbClient = this.client;
+                await this.database.connect();
+                req.dbClient = this.database;
                 next();
             } catch (err) {
                 this.logger.error('Failed to connect to MongoDB. Error: ' + err, 'MongoDB');
@@ -45,6 +47,7 @@ export class RyuPics {
     }
 
     private config(): void {
+        this.app.use(cors());
         this.app.set('view engine', 'ejs');
         this.app.set('views', join(__dirname, '../../', 'views'));
         this.app.use(express.static(join(__dirname, '../../', 'public')));
@@ -61,26 +64,26 @@ export class RyuPics {
 
             switch (method) {
                 case 'GET':
-                    router.get(path, handler);
+                    router.get(path, handler.run);
                     break;
                 case 'POST':
-                    router.post(path, this.upload.single('file'), handler);
+                    router.post(path, new KeyController(this).run, this.multer.single('file'), handler.run);
                     break;
                 default:
                     break;
             }
         });
 
-        router.get('*', ErrorController.notFound);
+        router.get('*', new ErrorController(this).run);
 
         return router;
     }
 
     private loadRoutes(): Array<Route> {
         const routes: Array<Route> = [
-            { method: 'GET', path: '/', handler: HomeController.index },
-            { method: 'GET', path: '/image/:id', handler: ImageController.getImageDataById },
-            { method: 'POST', path: '/upload', handler: UploaderController.handleUpload }
+            { method: 'GET', path: '/', handler: new HomeController(this) },
+            { method: 'GET', path: '/image/:id', handler: new ImageController(this) },
+            { method: 'POST', path: '/upload', handler: new UploaderController(this) }
         ];
 
         return routes;
@@ -88,7 +91,7 @@ export class RyuPics {
 
     async databaseConnection() {
         try {
-            await this.client.db('admin').command({ ping: 1 });
+            await this.database.db('admin').command({ ping: 1 });
             this.logger.success('Pinged your deployment. Successfully connected to MongoDB!', 'MongoDB');
         } catch (err) {
             this.logger.error('Failed to connect to MongoDB. Please check your connection string. Error: ' + err, 'MongoDB');

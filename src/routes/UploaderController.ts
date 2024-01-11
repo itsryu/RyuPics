@@ -1,25 +1,39 @@
 import { Request, Response } from 'express';
+import { RouteStructure } from '../structs/RouteStructure';
+import { RyuPics } from '../server';
 
-class UploaderController {
-    static handleUpload = async (
-        req: Request,
-        res: Response
-    ) => {
+class UploaderController extends RouteStructure {
+    constructor(client: RyuPics) {
+        super(client);
+    }
+
+    run = async (req: Request, res: Response) => {
         const { dbClient } = req;
         const database = dbClient.db('imagensDB');
         const collection = database.collection('imagens');
 
         const discordString = '||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​|| ‌‌';
-        
+
         try {
+            const ip = req.headers['x-forwarded-for'];
+
             const result = await collection.insertOne({
                 data: req.file?.buffer.toString('base64'),
                 contentType: req.file?.mimetype
             });
 
-            res.send(process.env.STATE == 'development' ? `${discordString}${process.env.LOCAL_URL}:${process.env.PORT}/image/${result.insertedId}` : `${discordString}${process.env.DOMAIN_URL}/image/${result.insertedId}`);
+            const URL = (this.client.state == 'development')
+                ? `${discordString}${process.env.LOCAL_URL}:${process.env.PORT}/image/${result.insertedId}`
+                : `${discordString}${process.env.DOMAIN_URL}/image/${result.insertedId}`;
+
+            this.client.logger.info(`Valid authorization key used:\nRoute: ${req.originalUrl}\nMethod: ${req.method}\nIP: ${ip}\nKey: ${process.env.AUTH_KEY}`, UploaderController.name);
+
+            return res.status(200).send(URL);
         } catch (err) {
-            res.status(500).send('Internal Server Error');
+            this.client.logger.error((err as Error).message, UploaderController.name);
+            this.client.logger.warn((err as Error).stack as string, UploaderController.name);
+
+            return res.status(500).json({ code: '500', message: 'Internal Server Error' });
         }
     };
 }

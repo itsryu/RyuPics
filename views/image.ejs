@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- Facebook Meta Tags -->
+    <meta name="theme-color" content="#2b2d31" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="📸 ✦ <%= uploads %> uploads" />
+    <meta property="og:image" content="<%= image %>" />
+    <meta property="og:url" content="<%= image %>" />
+    <meta property="og:title" content="Ryu da brenda" />
+    <meta name="pubdate" content="<%= date %>" />
+
+    <!-- Twitter Meta Tags -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta property="twitter:domain" content="ryuzaki.cloud" />
+    <meta name="twitter:image" content="<%= image %>" />
+    <meta property="twitter:url" content="<%= image %>" />
+    <meta name="twitter:title" content="Ryu da brenda" />
+
+    <link type="application/json+oembed" href="/embed.json" />
+    <link rel="stylesheet" href="/css/image.css">>
+
+    <title><%= title %></title>
+  </head>
+  <body>
+    <img src="<%= image %>" alt="<%= title %>" />
+  </body>
+</html>

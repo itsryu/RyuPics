@@ -8,6 +8,7 @@ declare global {
       LOCAL_URL: string;
       PORT: string;
       STATE: string;
+      AUTH_KEY: string;
     }
   }
 }
