@@ -8,7 +8,7 @@ class HomeController extends RouteStructure {
     }
 
     run = (req: Request, res: Response) => {
-        res.render('home');
+        res.status(200).render('home');
     };
 }
 

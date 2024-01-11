@@ -40,7 +40,7 @@ class ImageController extends RouteStructure {
 
                 return res.status(200).render('image', { title: imageId, image: fileLink, uploads, date: new Date() });
             } else {
-                return res.status(404).json({ code: '404', message: 'Not found' });
+                return res.status(404).render('404');
             }
         } catch (err) {
             this.client.logger.error((err as Error).message, ImageController.name);
