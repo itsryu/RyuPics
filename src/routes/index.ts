@@ -2,3 +2,8 @@ export * from './UploaderController';
 export * from './ImageController';
 export * from './HomeController';
 export * from './ErrorController';
+export * from './HealthCheckController';
+export * from './DeleteImageController';
+export * from './InfoMiddleware';
+export * from './KeyController';
+export * from './RateLimitController';

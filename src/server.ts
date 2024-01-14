@@ -1,15 +1,12 @@
 import express, { Express, Request, Response, NextFunction, Router } from 'express';
 import multer, { Multer, StorageEngine } from 'multer';
 import { MongoClient, ServerApiVersion } from 'mongodb';
-import { ErrorController, HomeController, ImageController, UploaderController } from './routes';
+import { ErrorController, HealthCheckController, HomeController, ImageController, UploaderController, KeyController, InfoMiddleware, DeleteImageController } from './routes';
 import { config } from 'dotenv';
 import { Route } from './types/HTTPInterfaces';
 import { Logger } from './utils/util';
 import { join } from 'path';
 import cors from 'cors';
-import { KeyController } from './routes/KeyController';
-import { InfoMiddleware } from './routes/InfoMiddleware';
-import { DeleteImageController } from './routes/DeleteImageController';
 config({ path: './.env' });
 
 export class RyuPics {
@@ -92,6 +89,7 @@ export class RyuPics {
     private loadRoutes(): Array<Route> {
         const routes: Array<Route> = [
             { method: 'GET', path: '/', handler: new HomeController(this) },
+            { method: 'GET', path: '/health', handler: new HealthCheckController(this) },
             { method: 'GET', path: '/image/:id', handler: new ImageController(this) },
             { method: 'POST', path: '/delete/:id', handler: new DeleteImageController(this) },
             { method: 'POST', path: '/upload', handler: new UploaderController(this) }
