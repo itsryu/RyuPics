@@ -15,7 +15,7 @@ async function main() {
                         isDirectory: false,
                         creator: "JauumVictor",
                         size: image.size,
-                        download: `http://localhost:3000/image/${image.name}`
+                        download: `https://pics.ryuzaki.cloud/image/${image.name}`
                     }
                 )),
             }]
@@ -103,7 +103,7 @@ function downloadMultipleFiles(files) {
 }
 
 async function getImages() {
-    const response = await fetch("http://localhost:3000/images", {
+    const response = await fetch("https://pics.ryuzaki.cloud/images", {
         method: "GET",
         headers: {
             "Content-Type": "application/json"
