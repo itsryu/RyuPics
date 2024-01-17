@@ -1,0 +1,23 @@
+div.dx-filemanager-dialog-delete-item > div {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+#file-manager {
+	width: 70%;
+	height: 40rem;
+	margin-right: auto;
+	margin-left: auto;
+}
+  
+@media (max-width: 768px) {
+	#file-manager {
+		width: 90%;
+		height: 40rem;
+	}
+
+    .dx-theme-generic-typography {
+    	margin-top: 10rem;
+    }
+}

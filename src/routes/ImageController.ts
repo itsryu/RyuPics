@@ -1,7 +1,6 @@
 import { promisify } from 'util';
 import { Request, Response } from 'express';
 import { mkdir } from 'fs/promises';
-import { ObjectId } from 'mongodb';
 import { join } from 'path';
 import { RouteStructure } from '../structs/RouteStructure';
 import { RyuPics } from '../server';
@@ -15,35 +14,33 @@ class ImageController extends RouteStructure {
     }
 
     run = async (req: Request, res: Response) => {
-        const { dbClient } = req;
-        const database = dbClient.db('imagensDB');
-        const collection = database.collection('imagens');
+        const database = this.client.database.db('data');
+        const collection = database.collection('images');
 
         try {
             const imageId = req.params.id;
-            const image = await collection.findOne({ _id: new ObjectId(imageId) });
+            const image = await collection.findOne({ name: imageId });
 
             if (!image) return res.status(404).render('404');
 
             const buffer = Buffer.from(image.data, 'base64');
             const imageDir = join(__dirname, '../../../', 'public', '.temp');
-            const fileName = `${imageId}.png`;
-            const filePath = join(imageDir, fileName);
+            const filePath = join(imageDir, imageId);
 
             if (!(await existsAsync(imageDir))) await mkdir(imageDir, { recursive: true });
 
             await writeFileAsync(filePath, buffer);
 
             const fileLink = (this.client.state === 'development')
-                ? `${process.env.LOCAL_URL}:${process.env.PORT}/.temp/${fileName}`
-                : `${process.env.DOMAIN_URL}/.temp/${fileName}`;
+                ? `${process.env.LOCAL_URL}:${process.env.PORT}/.temp/${imageId}`
+                : `${process.env.DOMAIN_URL}/.temp/${imageId}`;
 
             const uploads = await collection.countDocuments();
 
             res.locals.cacheControl = 'public, max-age=31536000';
             res.locals.expires = new Date(Date.now() + 31536000000).toUTCString();
-
-            return res.status(200).render('image', { title: imageId, image: fileLink, uploads, date: new Date().toDateString() });
+            
+            res.status(200).render('image', { title: imageId, image: fileLink, uploads, date: new Date().toDateString() });
         } catch (err) {
             this.client.logger.error((err as Error).message, ImageController.name);
             this.client.logger.warn((err as Error).stack as string, ImageController.name);

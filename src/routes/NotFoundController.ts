@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import { RouteStructure } from '../structs/RouteStructure';
 import { RyuPics } from '../server';
 
-class ErrorController extends RouteStructure{
+class NotFoundController extends RouteStructure{
     constructor(client: RyuPics) {
         super(client);
     }
@@ -12,4 +12,4 @@ class ErrorController extends RouteStructure{
     };
 }
 
-export { ErrorController };
+export { NotFoundController };

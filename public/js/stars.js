@@ -537,13 +537,13 @@ function position(x, y, z) {
     x:
       x * canvas.width +
       (canvas.width / 2 - mouse.x + (nPos.x - 0.5) * noiseStrength) *
-        z *
-        motion,
+      z *
+      motion,
     y:
       y * canvas.height +
       (canvas.height / 2 - mouse.y + (nPos.y - 0.5) * noiseStrength) *
-        z *
-        motion,
+      z *
+      motion,
   };
 }
 

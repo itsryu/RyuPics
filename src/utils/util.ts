@@ -1,3 +1,15 @@
+class Util {
+    formatFileSize(bytes: number): number {
+        if (bytes < 1024) {
+            return bytes;
+        } else if (bytes < 1024 * 1024) {
+            return (bytes / 1024);
+        } else {
+            return (bytes / (1024 * 1024));
+        }
+    }
+}
+
 class Logger {
     static Colors = {
         RESET: '\x1b[0m',
@@ -28,4 +40,4 @@ class Logger {
     }
 }
 
-export { Logger };
+export { Logger, Util };

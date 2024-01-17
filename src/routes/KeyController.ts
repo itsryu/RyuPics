@@ -18,7 +18,7 @@ class KeyController extends RouteStructure {
         } else {
             this.client.logger.warn(`Invalid authorization key used: ${userKey}`, KeyController.name);
 
-            return res.status(401).json({ error: 'Chave de autorização inválida.' });
+            return res.status(401).json({ code: '401', error: 'Chave de autorização inválida.' }).render('404');
         }
     };
 }

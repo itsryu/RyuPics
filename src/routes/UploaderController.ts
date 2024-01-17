@@ -8,23 +8,35 @@ class UploaderController extends RouteStructure {
     }
 
     run = async (req: Request, res: Response) => {
-        const { dbClient } = req;
-        const database = dbClient.db('imagensDB');
-        const collection = database.collection('imagens');
+        const database = this.client.database.db('data');
+        const collection = database.collection('images');
 
         const discordString = '||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​|| ‌‌';
 
         try {
-            const result = await collection.insertOne({
-                data: req.file?.buffer.toString('base64'),
-                contentType: req.file?.mimetype
-            });
+            const data = req.file?.buffer.toString('base64');
 
-            const URL = (this.client.state == 'development')
-                ? `${discordString}${process.env.LOCAL_URL}:${process.env.PORT}/image/${result.insertedId}`
-                : `${discordString}${process.env.DOMAIN_URL}/image/${result.insertedId}`;
+            if (data) {
+                const imageBuffer: Buffer = Buffer.from(data, 'base64');
+                const fileSize: number = imageBuffer.length;
 
-            return res.status(200).send(URL);
+                await collection.insertOne({
+                    name: req.file?.originalname,
+                    size: fileSize,
+                    contentType: req.file?.mimetype,
+                    data: req.file?.buffer.toString('base64')
+                })
+                    .then(() => this.client.logger.success(`Successfully uploaded ${req.file?.originalname} to the database.`, UploaderController.name))
+                    .catch((err) => this.client.logger.error(`Failed to upload ${req.file?.originalname} to the database. Error: ${err}`, UploaderController.name));
+
+                const URL = (this.client.state == 'development')
+                    ? `${discordString}${process.env.LOCAL_URL}:${process.env.PORT}/image/${req.file?.originalname}`
+                    : `${discordString}${process.env.DOMAIN_URL}/image/${req.file?.originalname}`;
+
+                return res.status(200).send(URL);
+            } else {
+                return res.status(400).json({ code: '400', message: 'Bad Request - Missing Data' });
+            }
         } catch (err) {
             this.client.logger.error((err as Error).message, UploaderController.name);
             this.client.logger.warn((err as Error).stack as string, UploaderController.name);
