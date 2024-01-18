@@ -1,7 +1,10 @@
-div.dx-filemanager-dialog-delete-item > div {
-    overflow: hidden;
-    white-space: nowrap;
-    text-overflow: ellipsis;
+.dx-popup-content.photo-popup-content img.photo-popup-image {
+	width: 100%;
+	height: 100%;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	margin: 0 auto;
 }
 
 #file-manager {
@@ -10,14 +13,20 @@ div.dx-filemanager-dialog-delete-item > div {
 	margin-right: auto;
 	margin-left: auto;
 }
-  
+
+#photo-popup img {
+	width: 100%;
+	height: 100%;
+	object-fit: contain;
+}
+
 @media (max-width: 768px) {
 	#file-manager {
 		width: 90%;
 		height: 40rem;
 	}
 
-    .dx-theme-generic-typography {
-    	margin-top: 10rem;
-    }
+	.dx-theme-generic-typography {
+		margin-top: 10rem;
+	}
 }

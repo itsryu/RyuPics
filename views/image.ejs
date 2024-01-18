@@ -32,59 +32,61 @@
     </div>
 
     <script>
-      const zoomContainer = document.getElementById("zoom-target");
-      const zoomedImage = document.querySelector("img");
-      let isZoomed = false;
-      let startPanX, startPanY;
-
-      zoomedImage.addEventListener("click", toggleZoom);
-      zoomContainer.addEventListener("mousemove", panImage);
-
-      function toggleZoom() {
-        isZoomed = !isZoomed;
-        zoomedImage.classList.toggle("zoomed", isZoomed);
-
-        resetPan();
-      }
-
-      function panImage(e) {
-        if (isZoomed) {
-          const { clientX, clientY } = e;
-          const deltaX = startPanX - clientX;
-          const deltaY = startPanY - clientY;
-
-          zoomedImage.style.transformOrigin = `${deltaX}px ${deltaY}px`;
-          zoomedImage.style.transform = `scale(2) translate(${deltaX}px, ${deltaY}px)`;
-        }
-      }
-
-      function resetPan() {
-        if (!isZoomed) {
-          zoomedImage.style.transformOrigin = "";
-          zoomedImage.style.transform = "";
-        } else {
-          const { width, height } = zoomedImage.getBoundingClientRect();
-
-          startPanX = (width - zoomContainer.clientWidth) / 2;
-          startPanY = (height - zoomContainer.clientHeight) / 2;
-        }
-      }
-
       document.addEventListener("DOMContentLoaded", function () {
-        const imageId = "<%- title %>";
+        if (window.innerWidth > 768) {
+          const zoomContainer = document.getElementById("zoom-target");
+          const zoomedImage = document.querySelector("img");
+          let isZoomed = false;
+          let startPanX, startPanY;
 
-        window.addEventListener("beforeunload", function () {
-          fetch(`/delete/${imageId}`, {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ imageId }),
-          })
-            .then((response) => response.text())
-            .then((data) => console.log(data))
-            .catch((error) => console.error("Error:", error));
-        });
+          zoomedImage.addEventListener("click", toggleZoom);
+          zoomContainer.addEventListener("mousemove", panImage);
+
+          function toggleZoom() {
+            isZoomed = !isZoomed;
+            zoomedImage.classList.toggle("zoomed", isZoomed);
+
+            resetPan();
+          }
+
+          function panImage(e) {
+            if (isZoomed) {
+              const { clientX, clientY } = e;
+              const deltaX = startPanX - clientX;
+              const deltaY = startPanY - clientY;
+
+              zoomedImage.style.transformOrigin = `${deltaX}px ${deltaY}px`;
+              zoomedImage.style.transform = `scale(2) translate(${deltaX}px, ${deltaY}px)`;
+            }
+          }
+
+          function resetPan() {
+            if (!isZoomed) {
+              zoomedImage.style.transformOrigin = "";
+              zoomedImage.style.transform = "";
+            } else {
+              const { width, height } = zoomedImage.getBoundingClientRect();
+
+              startPanX = (width - zoomContainer.clientWidth) / 2;
+              startPanY = (height - zoomContainer.clientHeight) / 2;
+            }
+          }
+
+          window.addEventListener("beforeunload", function () {
+            const imageId = "<%- title %>";
+
+            fetch(`/delete/${imageId}`, {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({ imageId }),
+            })
+              .then((response) => response.text())
+              .then((data) => console.log(data))
+              .catch((error) => console.error("Error:", error));
+          });
+        }
       });
     </script>
   </body>

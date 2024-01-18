@@ -11,8 +11,6 @@ class UploaderController extends RouteStructure {
         const database = this.client.database.db('data');
         const collection = database.collection('images');
 
-        const discordString = '||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​|| ‌‌';
-
         try {
             const data = req.file?.buffer.toString('base64');
 
@@ -23,6 +21,7 @@ class UploaderController extends RouteStructure {
                 await collection.insertOne({
                     name: req.file?.originalname,
                     size: fileSize,
+                    date: Date.now(),
                     contentType: req.file?.mimetype,
                     data: req.file?.buffer.toString('base64')
                 })
@@ -30,8 +29,8 @@ class UploaderController extends RouteStructure {
                     .catch((err) => this.client.logger.error(`Failed to upload ${req.file?.originalname} to the database. Error: ${err}`, UploaderController.name));
 
                 const URL = (this.client.state == 'development')
-                    ? `${discordString}${process.env.LOCAL_URL}:${process.env.PORT}/image/${req.file?.originalname}`
-                    : `${discordString}${process.env.DOMAIN_URL}/image/${req.file?.originalname}`;
+                    ? `${process.env.LOCAL_URL}:${process.env.PORT}/image/${req.file?.originalname}`
+                    : `${process.env.DOMAIN_URL}/image/${req.file?.originalname}`;
 
                 return res.status(200).send(URL);
             } else {

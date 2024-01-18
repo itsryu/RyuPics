@@ -12,7 +12,7 @@ class ImagesController extends RouteStructure {
         const collection = await database.collection('images').find({}).toArray();
 
         try {
-            res.json(collection);
+            res.json({ code: '200', message: 'OK', data: collection });
         } catch (err) {
             this.client.logger.error((err as Error).message, ImagesController.name);
             this.client.logger.warn((err as Error).stack as string, ImagesController.name);

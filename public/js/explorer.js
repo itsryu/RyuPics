@@ -3,22 +3,19 @@ async function main() {
         const imagesResponse = await getImages();
 
         const fileSystem = [{
-            name: "Archives",
+            name: "Images",
             isDirectory: true,
-            items: [{
-                name: "Images",
-                isDirectory: true,
-                creator: "JauumVictor",
-                items: imagesResponse.map((image) => (
-                    {
-                        name: image.name,
-                        isDirectory: false,
-                        creator: "JauumVictor",
-                        size: image.size,
-                        download: `https://pics.ryuzaki.cloud/image/${image.name}`
-                    }
-                )),
-            }]
+            creator: "JauumVictor",
+            items: imagesResponse.map((image) => (
+                {
+                    name: image.name,
+                    thumbnail: base64ToIco(image.data),
+                    isDirectory: false,
+                    creator: "JauumVictor",
+                    size: image.size,
+                    download: `https://pics.ryuzaki.cloud/image/${image.name}`
+                }
+            )),
         }];
 
         const objectProvider = new DevExpress.fileManagement.ObjectFileSystemProvider({
@@ -41,22 +38,58 @@ async function main() {
 
         $(function () {
             $("#file-manager").dxFileManager({
-                name: "File Manager",
+                name: "fileManager",
                 fileSystemProvider: customProvider,
                 currentPath: "Documents",
-                rootFolderName: "Root",
+                rootFolderName: "Files",
                 permissions: {
                     download: true
                 },
-                language: "pt-BR",
-                onToolbarItemClick(e) {
-                    if (e.itemData === "delete") {
-                        const itemName = e.component.getSelectedItems()[0].name;
+                itemView: {
+                    mode: 'thumbnails',
+                },
+                language: "en-US",
+                onSelectedFileOpened(e) {
+                    const popup = $('#photo-popup').dxPopup('instance');
 
-                        setTimeout(function () {
-                            $("div.dx-filemanager-dialog-delete-item > div").attr("title", itemName);
-                        }, 0);
-                    }
+                    popup.option({
+                        title: e.file.name,
+                        contentTemplate: `<img src="${e.file.dataItem.thumbnail}" class="photo-popup-image" />`,
+                        toolbarItems: [{
+                            locateInMenu: 'always',
+                            widget: 'dxButton',
+                            toolbar: 'top',
+                            collision: 'fit',
+                            options: {
+                                text: 'Copy',
+
+                                onClick() {
+                                    const copyToClipboard = async (text) => {
+                                        try {
+                                            await navigator.clipboard.writeText(text);
+                                            setCopied(text);
+                                        } catch (err) {
+
+                                            setCopied('');
+                                        }
+                                    };
+
+                                    copyToClipboard('https://pics.ryuzaki.cloud/image/' + e.file.name);
+                                    const message = `Link copied to clipboard: ${'https://pics.ryuzaki.cloud/image/' + e.file.name}`;
+
+                                    DevExpress.ui.notify({
+                                        message,
+                                        position: {
+                                            my: 'center top',
+                                            at: 'center top',
+                                        },
+                                    }, 'success', 3000);
+                                },
+                            },
+                        }],
+                    });
+
+                    popup.show();
                 },
                 contextMenu: {
                     items: ["create", {
@@ -65,11 +98,22 @@ async function main() {
                 },
                 customizeDetailColumns: (columns) => {
                     columns.push({
-                        caption: "Created",
+                        caption: "created",
                         dataField: "dataItem.creator"
                     });
+
                     return columns;
-                }
+                },
+            });
+
+            $('#photo-popup').dxPopup({
+                maxHeight: 600,
+                hideOnOutsideClick: true,
+                showCloseButton: true,
+                onContentReady(e) {
+                    const $contentElement = e.component.content();
+                    $contentElement.addClass('photo-popup-content');
+                },
             });
         });
     } catch (error) {
@@ -83,7 +127,7 @@ function downloadSingleFile(file) {
     if (downloadLink) {
         window.open(downloadLink, '_blank');
     } else {
-        console.error("Link de download não disponível para o arquivo selecionado.");
+        console.error("Download link not avaliable.");
     }
 }
 
@@ -92,27 +136,62 @@ function downloadMultipleFiles(files) {
 
     files.forEach(function (file) {
         const content = file.dataItem.dataItem.download || "";
-        
+
         zip.file(file.name, content, { base64: true });
     });
 
     zip.generateAsync({ type: "blob" })
         .then(function (content) {
-            saveAs(content, "Download.zip");
+            saveAs(content, "download.zip");
         });
 }
 
 async function getImages() {
-    const response = await fetch("https://pics.ryuzaki.cloud/images", {
+    const response = await fetch("/images", {
         method: "GET",
         headers: {
             "Content-Type": "application/json"
         }
-    })
+    }).then((response) => response.json());
 
-    const data = await response.json();
+    return response.data;
+}
 
-    return data;
+function base64toBlob(base64Data, contentType) {
+    contentType = contentType || '';
+    const sliceSize = 1024;
+    const byteCharacters = atob(base64Data);
+    const byteArrays = [];
+
+    for (let offset = 0; offset < byteCharacters.length; offset += sliceSize) {
+        const slice = byteCharacters.slice(offset, offset + sliceSize);
+        const byteNumbers = new Array(slice.length);
+        for (let i = 0; i < slice.length; i++) {
+            byteNumbers[i] = slice.charCodeAt(i);
+        }
+        const byteArray = new Uint8Array(byteNumbers);
+        byteArrays.push(byteArray);
+    }
+
+    return new Blob(byteArrays, { type: contentType });
+}
+
+// Função para converter base64 para ícone (.ico)
+function base64ToIco(base64Data) {
+    const blob = base64toBlob(base64Data, 'image/png');
+    const img = new Image();
+
+    img.onload = function () {
+        const canvas = document.createElement('canvas');
+        canvas.width = img.width;
+        canvas.height = img.height;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0);
+
+        canvas.toDataURL('image/x-icon');
+    };
+
+    return URL.createObjectURL(blob);
 }
 
 main();
