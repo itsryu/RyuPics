@@ -9,30 +9,40 @@ class UploaderController extends RouteStructure {
 
     run = async (req: Request, res: Response) => {
         const database = this.client.database.db('data');
-        const collection = database.collection('images');
+        const collection = database.collection('files');
 
         try {
             const data = req.file?.buffer.toString('base64');
+            const name = req.file?.originalname;
+            const allowedExt = ['png', 'jpg', 'jpeg', 'gif', 'webp', 'mp4', 'mov', 'webm', 'mp3', 'wav', 'ogg'];
 
             if (data) {
                 const imageBuffer: Buffer = Buffer.from(data, 'base64');
                 const fileSize: number = imageBuffer.length;
 
-                await collection.insertOne({
-                    name: req.file?.originalname,
-                    size: fileSize,
-                    date: Date.now(),
-                    contentType: req.file?.mimetype,
-                    data: req.file?.buffer.toString('base64')
-                })
-                    .then(() => this.client.logger.success(`Successfully uploaded ${req.file?.originalname} to the database.`, UploaderController.name))
-                    .catch((err) => this.client.logger.error(`Failed to upload ${req.file?.originalname} to the database. Error: ${err}`, UploaderController.name));
+                if (!allowedExt.some(((ext) => name?.includes(ext)))) {
+                    return res.status(400).json({ code: '400', message: 'Bad Request - Invalid File Type' });
+                } else if (fileSize > 8000000) {
+                    return res.status(400).json({ code: '400', message: 'Bad Request - File Size Too Large' });
+                } else if ((await collection.find({ name }).toArray()).length > 0) {
+                    return res.status(400).json({ code: '400', message: 'Bad Request - File Already Exists' });
+                } else {
+                    await collection.insertOne({
+                        name: name,
+                        size: fileSize,
+                        date: Date.now(),
+                        contentType: req.file?.mimetype,
+                        data: req.file?.buffer.toString('base64')
+                    })
+                        .then(() => this.client.logger.success(`Successfully uploaded ${req.file?.originalname} to the database.`, UploaderController.name))
+                        .catch((err) => this.client.logger.error(`Failed to upload ${req.file?.originalname} to the database. Error: ${err}`, UploaderController.name));
 
-                const URL = (this.client.state == 'development')
-                    ? `${process.env.LOCAL_URL}:${process.env.PORT}/image/${req.file?.originalname}`
-                    : `${process.env.DOMAIN_URL}/image/${req.file?.originalname}`;
+                    const URL = (this.client.state == 'development')
+                        ? `${process.env.LOCAL_URL}:${process.env.PORT}/file/${req.file?.originalname}`
+                        : `${process.env.DOMAIN_URL}/file/${req.file?.originalname}`;
 
-                return res.status(200).send(URL);
+                    return res.status(200).send(URL);
+                }
             } else {
                 return res.status(400).json({ code: '400', message: 'Bad Request - Missing Data' });
             }

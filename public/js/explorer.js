@@ -1,22 +1,39 @@
 async function main() {
     try {
-        const imagesResponse = await getImages();
+        const filesArray = await getFiles();
 
-        const fileSystem = [{
-            name: "Images",
-            isDirectory: true,
-            creator: "JauumVictor",
-            items: imagesResponse.map((image) => (
-                {
-                    name: image.name,
-                    thumbnail: base64ToIco(image.data),
-                    isDirectory: false,
-                    creator: "JauumVictor",
-                    size: image.size,
-                    download: `https://pics.ryuzaki.cloud/image/${image.name}`
-                }
-            )),
-        }];
+        const fileSystem = [
+            {
+                name: "Images",
+                isDirectory: true,
+                creator: "JauumVictor",
+                items: filesArray.filter((file) => file.name.endsWith('png')).map((file) => (
+                    {
+                        name: file.name,
+                        thumbnail: blobToURL(file.data, 'image/png'),
+                        isDirectory: false,
+                        creator: "JauumVictor",
+                        size: file.size,
+                        download: `https://pics.ryuzaki.cloud/file/${file.name}`
+                    }
+                )),
+            },
+            {
+                name: "Videos",
+                isDirectory: true,
+                creator: "JauumVictor",
+                items: filesArray.filter((file) => file.name.endsWith('mp4')).map((file) => (
+                    {
+                        name: file.name,
+                        data: blobToURL(file.data, 'video/mp4'),
+                        isDirectory: false,
+                        creator: "JauumVictor",
+                        size: file.size,
+                        download: `https://pics.ryuzaki.cloud/file/${file.name}`
+                    }
+                )),
+            }
+        ];
 
         const objectProvider = new DevExpress.fileManagement.ObjectFileSystemProvider({
             data: fileSystem
@@ -51,17 +68,21 @@ async function main() {
                 language: "en-US",
                 onSelectedFileOpened(e) {
                     const popup = $('#photo-popup').dxPopup('instance');
+                    const name = e.file.name;
+
+                    console.log(e.file);
 
                     popup.option({
-                        title: e.file.name,
-                        contentTemplate: `<img src="${e.file.dataItem.thumbnail}" class="photo-popup-image" />`,
+                        title: name,
+                        contentTemplate: ['webp', 'mp4', 'mov', 'webm', 'mp3', 'wav', 'ogg'].some((ext) => name.endsWith(ext)) ? `<video preload=${e.file.dataItem.dataItem.data} class="photo-popup-image" controls>  <source src=${e.file.dataItem.dataItem.data} type="video/mp4"> Seu navegador não suporta o elemento de vídeo. </video>` : `<img id="image" src="${e.file.dataItem.thumbnail}" class="photo-popup-image" />`,
                         toolbarItems: [{
                             locateInMenu: 'always',
                             widget: 'dxButton',
-                            toolbar: 'top',
+                            toolbar: 'bottom',
                             collision: 'fit',
                             options: {
                                 text: 'Copy',
+                                collision: 'fit',
 
                                 onClick() {
                                     const copyToClipboard = async (text) => {
@@ -74,8 +95,8 @@ async function main() {
                                         }
                                     };
 
-                                    copyToClipboard('https://pics.ryuzaki.cloud/image/' + e.file.name);
-                                    const message = `Link copied to clipboard: ${'https://pics.ryuzaki.cloud/image/' + e.file.name}`;
+                                    copyToClipboard('https://pics.ryuzaki.cloud/file/' + e.file.name);
+                                    const message = `Link copied to clipboard: ${'https://pics.ryuzaki.cloud/file/' + e.file.name}`;
 
                                     DevExpress.ui.notify({
                                         message,
@@ -146,8 +167,8 @@ function downloadMultipleFiles(files) {
         });
 }
 
-async function getImages() {
-    const response = await fetch("/images", {
+async function getFiles() {
+    const response = await fetch("/files", {
         method: "GET",
         headers: {
             "Content-Type": "application/json"
@@ -158,7 +179,6 @@ async function getImages() {
 }
 
 function base64toBlob(base64Data, contentType) {
-    contentType = contentType || '';
     const sliceSize = 1024;
     const byteCharacters = atob(base64Data);
     const byteArrays = [];
@@ -166,30 +186,22 @@ function base64toBlob(base64Data, contentType) {
     for (let offset = 0; offset < byteCharacters.length; offset += sliceSize) {
         const slice = byteCharacters.slice(offset, offset + sliceSize);
         const byteNumbers = new Array(slice.length);
+
         for (let i = 0; i < slice.length; i++) {
             byteNumbers[i] = slice.charCodeAt(i);
         }
+
         const byteArray = new Uint8Array(byteNumbers);
+
         byteArrays.push(byteArray);
     }
 
     return new Blob(byteArrays, { type: contentType });
 }
 
-// Função para converter base64 para ícone (.ico)
-function base64ToIco(base64Data) {
-    const blob = base64toBlob(base64Data, 'image/png');
-    const img = new Image();
 
-    img.onload = function () {
-        const canvas = document.createElement('canvas');
-        canvas.width = img.width;
-        canvas.height = img.height;
-        const ctx = canvas.getContext('2d');
-        ctx.drawImage(img, 0, 0);
-
-        canvas.toDataURL('image/x-icon');
-    };
+function blobToURL(base64Data, contentType) {
+    const blob = base64toBlob(base64Data, contentType);
 
     return URL.createObjectURL(blob);
 }
