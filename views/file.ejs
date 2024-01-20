@@ -11,6 +11,7 @@
   <meta property="og:site_name" content="📸 ✦ <%= uploads %> uploads" />
   <meta property="og:url" content="https://pics.ryuzaki.cloud/" />
   <meta property="og:title" content="Amo a Brenda" />
+  <meta property="og:updated_time" content="<%= date %>" />
 
   <% if (['webp', 'mp4', 'mov', 'webm', 'mp3', 'wav', 'ogg'].some((ext)=> title.endsWith(ext))) { %>
     <meta property="og:type" content="video" />
@@ -50,9 +51,9 @@
         <source src="<%= file %>" type="video/<%= type %>">
         Your browser does not support the video element.
       </video>
-      <% } else if (['png', 'jpg' , 'jpeg' , 'gif' ].some((ext)=> title.endsWith(ext))) { %>
-        <img src="<%= file %>" alt="<%= title %>" />
-        <% } %>
+    <% } else if (['png', 'jpg' , 'jpeg' , 'gif' ].some((ext)=> title.endsWith(ext))) { %>
+      <img src="<%= file %>" alt="<%= title %>" />
+    <% } %>
   </div>
 
   <script>
