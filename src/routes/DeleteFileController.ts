@@ -11,9 +11,9 @@ class DeleteFileController extends RouteStructure {
 
     run = (req: Request, res: Response) => {
         try {
-            const imageId = req.params.id;
+            const fileName = req.params.id;
             const fileDir = join(__dirname, '../../../', 'public', '.temp');
-            const file = readdirSync(fileDir).find(file => file === imageId + '.png');
+            const file = readdirSync(fileDir).find(file => file === fileName);
 
             if (!file) return res.status(404).json({ code: '404', message: 'Not Found' });
 
