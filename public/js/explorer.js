@@ -74,7 +74,7 @@ async function main() {
 
                     popup.option({
                         title: name,
-                        contentTemplate: ['webp', 'mp4', 'mov', 'webm', 'mp3', 'wav', 'ogg'].some((ext) => name.endsWith(ext)) ? `<video preload=${e.file.dataItem.dataItem.data} class="photo-popup-image" controls>  <source src=${e.file.dataItem.dataItem.data} type="video/mp4"> Seu navegador não suporta o elemento de vídeo. </video>` : `<img id="image" src="${e.file.dataItem.thumbnail}" class="photo-popup-image" />`,
+                        contentTemplate: ['webp', 'mp4', 'mov', 'webm', 'mp3', 'wav', 'ogg'].some((ext) => name.endsWith(ext)) ? `<video preload="metadata" class="photo-popup-image" controls>  <source src=${e.file.dataItem.dataItem.data} type="video/mp4"> Seu navegador não suporta o elemento de vídeo. </video>` : `<img id="image" src="${e.file.dataItem.thumbnail}" class="photo-popup-image" />`,
                         toolbarItems: [{
                             locateInMenu: 'always',
                             widget: 'dxButton',

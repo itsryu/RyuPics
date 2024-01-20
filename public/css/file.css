@@ -17,6 +17,14 @@ body {
     transition: transform 0ms ease-in-out;
 }
 
+.zoom-container video {
+    width: 80%;
+    height: 80%;
+    max-width: 200%;
+    max-height: 200%;
+    cursor: auto;
+}
+
 .zoom-container {
     margin: 0;
     position: relative;
