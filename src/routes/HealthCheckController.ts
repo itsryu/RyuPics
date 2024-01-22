@@ -8,7 +8,7 @@ class HealthCheckController extends RouteStructure {
     }
 
     run = (req: Request, res: Response) => {
-        res.status(200).json({ code: '200', message: 'OK' });
+        return res.status(200).json({ code: '200', message: 'OK' });
     };
 }
 

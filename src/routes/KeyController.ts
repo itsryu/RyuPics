@@ -8,17 +8,22 @@ class KeyController extends RouteStructure {
     }
 
     run = (req: Request, res: Response, next: NextFunction) => {
-        const userKey = req.headers['auth'];
+        const auth = req.headers['authorization'];
+        const [bearer, token] = auth?.length ? (auth.split(' ')) : ['Bearer', ''];
 
-        if (!userKey) return res.status(401).json({ code: '400', message: 'Bad Request - Missing Data' });
-
-        if (userKey && userKey === process.env.AUTH_KEY) {
-            this.client.logger.info(`Valid authorization key used: ${userKey}`, KeyController.name);
-            return next();
-        } else {
-            this.client.logger.warn(`Invalid authorization key used: ${userKey}`, KeyController.name);
-
-            return res.status(401).json({ code: '401', message: 'Chave de autorização inválida.' }).render('404');
+        try {
+            if (bearer !== 'Bearer' || !token) {
+                return res.status(400).json({ code: '400', message: 'Bad Request' });
+            } else if (token !== process.env.AUTH_KEY) {
+                this.client.logger.warn(`Invalid authorization key used: ${token}`, KeyController.name);
+                return res.status(401).json({ code: '401', message: 'Unauthorized' });
+            } else {
+                this.client.logger.info(`Valid authorization key used: ${token}`, KeyController.name);
+                return next();
+            }
+        } catch (error) {
+            this.client.logger.error(error as string, KeyController.name);
+            return res.status(500).json({ code: '500', message: 'Internal Server Error' });
         }
     };
 }

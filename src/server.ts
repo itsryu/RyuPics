@@ -11,15 +11,15 @@ import { json } from 'body-parser';
 config({ path: './.env' });
 
 export class RyuPics {
-    app: Express = express();
-    logger: Logger = new Logger();
-    utils: Util = new Util();
-    storage: StorageEngine = multer.memoryStorage();
-    multer: Multer = multer({ storage: this.storage });
-    database: MongoClient;
-    state!: string;
+    public readonly app: Express = express();
+    public readonly logger: Logger = new Logger();
+    public readonly utils: Util = new Util();
+    public readonly storage: StorageEngine = multer.memoryStorage();
+    public readonly multer: Multer = multer({ storage: this.storage });
+    public readonly database: MongoClient;
+    public state!: string;
 
-    constructor(state: string) {
+    public constructor(state: string) {
         this.state = state;
 
         this.database = new MongoClient(process.env.MONGODB_URI, {
@@ -101,11 +101,11 @@ export class RyuPics {
             
             this.logger.success('Pinged your deployment. Successfully connected to MongoDB!', 'MongoDB');
         } catch (err) {
-            this.logger.error('Failed to connect to MongoDB. Please check your connection string. Error: ' + err, 'MongoDB');
+            this.logger.error('Failed to ping your deployment. Please check your connection string. Error: ' + err, 'MongoDB');
         }
     }
 
-    public async start() {
+    public async listen() {
         this.app.listen(process.env.PORT, () => {
             this.logger.success(`Server is running at ${this.state == 'development' ? `${process.env.LOCAL_URL}:${process.env.PORT}/` : `${process.env.DOMAIN_URL}`}`, 'Server');
         });

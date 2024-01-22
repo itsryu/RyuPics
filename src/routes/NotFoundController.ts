@@ -8,7 +8,7 @@ class NotFoundController extends RouteStructure{
     }
 
     run = (req: Request, res: Response) => {
-        res.status(404).render('404');
+        return res.status(404).render('404');
     };
 }
 

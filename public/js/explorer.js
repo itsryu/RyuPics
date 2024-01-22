@@ -171,7 +171,8 @@ async function getFiles() {
     const response = await fetch("/files", {
         method: "GET",
         headers: {
-            "Content-Type": "application/json"
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${key}`
         }
     }).then((response) => response.json());
 

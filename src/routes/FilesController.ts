@@ -10,9 +10,17 @@ class FilesController extends RouteStructure {
     run = async (req: Request, res: Response) => {
         const database = this.client.database.db('data');
         const collection = await database.collection('files').find({}).toArray();
+        const auth = req.headers['authorization'];
+        const [bearer, token] = auth?.length ? (auth.split(' ')) : ['Bearer', ''];
 
         try {
-            res.json({ code: '200', message: 'OK', data: collection });
+            if (bearer !== 'Bearer' || !token) {
+                return res.status(400).json({ code: '400', message: 'Bad Request - Missing Token' });
+            } else if (token !== process.env.AUTH_KEY) {
+                return res.status(401).json({ code: '401', message: 'Unauthorized' });
+            } else {
+                return res.status(200).json({ code: '200', message: 'OK', data: collection });
+            }
         } catch (err) {
             this.client.logger.error((err as Error).message, FilesController.name);
             this.client.logger.warn((err as Error).stack as string, FilesController.name);

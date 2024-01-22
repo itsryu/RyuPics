@@ -4,4 +4,4 @@ const client = new RyuPics(process.env.STATE);
 
 console.clear();
 
-(async() => await client.start())();
+(async() => await client.listen())();

@@ -47,7 +47,7 @@
 <body>
   <div class="zoom-container" id="zoom-target">
     <% if (['webp', 'mp4' , 'mov' , 'webm' , 'mp3' , 'wav' , 'ogg' ].some((ext)=> title.endsWith(ext))) { %>
-      <video controls>
+      <video controls >
         <source src="<%= file %>" type="video/<%= type %>">
         Your browser does not support the video element.
       </video>

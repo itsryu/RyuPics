@@ -11,7 +11,7 @@ class HttpError extends Error {
     }
 }
 
-abstract class RouteStructure<T = Request, K = Response, N = NextFunction, V = void> {
+abstract class RouteStructure<T = Request, K = Response, N = NextFunction, V = void | any> {
     readonly client: RyuPics;
 
     constructor(client: RyuPics) {

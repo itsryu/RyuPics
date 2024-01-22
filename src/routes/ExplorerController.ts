@@ -9,16 +9,16 @@ class ExplorerController extends RouteStructure {
 
     run = (req: Request, res: Response) => {
         if (req.method === 'GET') {
-            res.status(200).render('form');
+            return res.status(200).render('form');
         } else if (req.method === 'POST') {
             const { apiKey } = req.body;
 
             if (apiKey === process.env.AUTH_KEY) {
-                res.status(200).render('explorer');
+                return res.status(200).render('explorer', { apiKey });
             } else {
-                res.status(401).send(`
+                return res.status(401).send(`
                     <script>
-                        alert("Chave de autenticação inválida!");
+                        alert("Invalid Authorization Key!");
                         window.location.href = '/explorer';
                     </script>
                 `);

@@ -23,11 +23,11 @@ class DeleteFileController extends RouteStructure {
 
             this.client.logger.success(`${filePath} deleted successfully.`, DeleteFileController.name);
 
-            res.status(200).json({ code: '200', message: 'OK' });
+            return res.status(200).json({ code: '200', message: 'OK' });
         } catch (error) {
             this.client.logger.error(error as string, DeleteFileController.name);
 
-            res.status(500).json({ code: '500', message: 'Internal Server Error' });
+            return res.status(500).json({ code: '500', message: 'Internal Server Error' });
         }
     };
 }
