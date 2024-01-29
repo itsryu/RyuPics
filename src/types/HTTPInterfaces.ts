@@ -8,7 +8,7 @@ interface Route {
 
 type HttpMethod = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH' | 'OPTIONS' | 'HEAD'
 
-enum HttpStatus {
+enum HTTPStatus {
     CONTINUE = 100,
     SWITCHING_PROTOCOLS = 101,
     PROCESSING = 102,
@@ -78,4 +78,4 @@ enum HttpStatus {
     NETWORK_AUTHENTICATION_REQUIRED = 511,
 }
 
-export { Route, HttpMethod, HttpStatus };
+export { Route, HttpMethod, HTTPStatus };

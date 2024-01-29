@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { RouteStructure } from '../structs/RouteStructure';
+import { JSONResponse, RouteStructure } from '../structs/RouteStructure';
 import { RyuPics } from '../server';
 
 class UploaderController extends RouteStructure {
@@ -21,11 +21,11 @@ class UploaderController extends RouteStructure {
                 const fileSize: number = imageBuffer.length;
 
                 if (!allowedExt.some(((ext) => name?.includes(ext)))) {
-                    return res.status(400).json({ code: '400', message: 'Bad Request - Invalid File Type' });
+                    return res.status(400).json(new JSONResponse(400, 'Bad Request - Invalid File Type').toJSON());
                 } else if (fileSize > 8000000) {
-                    return res.status(400).json({ code: '400', message: 'Bad Request - File Size Too Large' });
+                    return res.status(400).json(new JSONResponse(400, 'Bad Request - File Size Too Large').toJSON());
                 } else if ((await collection.find({ name }).toArray()).length > 0) {
-                    return res.status(400).json({ code: '400', message: 'Bad Request - File Already Exists' });
+                    return res.status(400).json(new JSONResponse(400, 'Bad Request - File Already Exists').toJSON());
                 } else {
                     await collection.insertOne({
                         name: name,
@@ -44,13 +44,13 @@ class UploaderController extends RouteStructure {
                     return res.status(200).send(URL);
                 }
             } else {
-                return res.status(400).json({ code: '400', message: 'Bad Request - Missing Data' });
+                return res.status(400).json(new JSONResponse(400, 'Bad Request - Missing Data').toJSON());
             }
         } catch (err) {
             this.client.logger.error((err as Error).message, UploaderController.name);
             this.client.logger.warn((err as Error).stack as string, UploaderController.name);
 
-            return res.status(500).json({ code: '500', message: 'Internal Server Error' });
+            return res.status(500).json(new JSONResponse(500, 'Internal Server Error').toJSON());
         }
     };
 }

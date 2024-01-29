@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { RouteStructure } from '../structs/RouteStructure';
+import { JSONResponse, RouteStructure } from '../structs/RouteStructure';
 import { RyuPics } from '../server';
 
 class FilesController extends RouteStructure {
@@ -15,17 +15,17 @@ class FilesController extends RouteStructure {
 
         try {
             if (bearer !== 'Bearer' || !token) {
-                return res.status(400).json({ code: '400', message: 'Bad Request - Missing Token' });
+                return res.status(400).json(new JSONResponse(400, 'Bad Request - Missing Token').toJSON());
             } else if (token !== process.env.AUTH_KEY) {
-                return res.status(401).json({ code: '401', message: 'Unauthorized' });
+                return res.status(401).json(new JSONResponse(401, 'Unauthorized').toJSON());
             } else {
-                return res.status(200).json({ code: '200', message: 'OK', data: collection });
+                return res.status(200).json(new JSONResponse(200, 'OK', collection).toJSON());
             }
         } catch (err) {
             this.client.logger.error((err as Error).message, FilesController.name);
             this.client.logger.warn((err as Error).stack as string, FilesController.name);
 
-            res.status(500).json({ code: '500', message: 'Internal Server Error' });
+            return res.status(500).json(new JSONResponse(500, 'Internal Server Error').toJSON());
         }
     };
 }

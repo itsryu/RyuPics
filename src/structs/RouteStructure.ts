@@ -1,24 +1,58 @@
 import { RyuPics } from '../server';
-import { HttpStatus } from '../types/HTTPInterfaces';
+import { HTTPStatus } from '../types/HTTPInterfaces';
 import { NextFunction, Request, Response } from 'express';
 
-class HttpError extends Error {
-    readonly code: HttpStatus;
+interface JSONObjectResponse {
+    code: number,
+    message: string,
+    data?: any
+}
 
-    constructor(code: HttpStatus, message: string) {
-        super(message);
-        this.code = code;
+class JSONResponse {
+    constructor(
+        private readonly code: HTTPStatus,
+        private readonly message: string,
+        private readonly data?: any
+    ) { }
+
+    toJSON(): JSONObjectResponse {
+        const object = { code: this.code, message: this.message };
+
+        this.data && this.data.length > 0 ? Object.defineProperty(object, 'data', {
+            value: this.data,
+            writable: true,
+            configurable: true,
+            enumerable: true
+        }) : null;
+
+        return object;
+    }
+
+    fromObject(obj: { code: HTTPStatus; message: string; data?: any }): JSONResponse {
+        return new JSONResponse(obj.code, obj.message, obj.data);
+    }
+
+    getStatusCode(): HTTPStatus {
+        return this.code;
+    }
+
+    getMessage(): string {
+        return this.message;
+    }
+
+    getData(): any[] | undefined {
+        return this.data;
     }
 }
 
 abstract class RouteStructure<T = Request, K = Response, N = NextFunction, V = void | any> {
-    readonly client: RyuPics;
+    public readonly client: RyuPics;
 
-    constructor(client: RyuPics) {
+    public constructor(client: RyuPics) {
         this.client = client;
     }
 
-    abstract run(req: T, res: K, next: N): V;
+    public abstract run(req: T, res: K, next: N): V;
 }
 
-export { HttpError, RouteStructure };
+export { JSONResponse, RouteStructure };

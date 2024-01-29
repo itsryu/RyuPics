@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from 'express';
-import { RouteStructure } from '../structs/RouteStructure';
+import { JSONResponse, RouteStructure } from '../structs/RouteStructure';
 import { RyuPics } from '../server';
 
 class KeyController extends RouteStructure {
@@ -13,17 +13,19 @@ class KeyController extends RouteStructure {
 
         try {
             if (bearer !== 'Bearer' || !token) {
-                return res.status(400).json({ code: '400', message: 'Bad Request' });
+                return res.status(400).json(new JSONResponse(400,'Bad Request').toJSON());
             } else if (token !== process.env.AUTH_KEY) {
                 this.client.logger.warn(`Invalid authorization key used: ${token}`, KeyController.name);
-                return res.status(401).json({ code: '401', message: 'Unauthorized' });
+                return res.status(401).json(new JSONResponse(401, 'Unauthorized').toJSON());
             } else {
                 this.client.logger.info(`Valid authorization key used: ${token}`, KeyController.name);
                 return next();
             }
-        } catch (error) {
-            this.client.logger.error(error as string, KeyController.name);
-            return res.status(500).json({ code: '500', message: 'Internal Server Error' });
+        } catch (err) {
+            this.client.logger.error((err as Error).message, KeyController.name);
+            this.client.logger.warn((err as Error).stack as string, KeyController.name);
+
+            return res.status(500).json(new JSONResponse(500, 'Internal Server Error').toJSON());
         }
     };
 }
