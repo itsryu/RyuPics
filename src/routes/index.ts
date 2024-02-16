@@ -8,3 +8,4 @@ export * from './InfoMiddleware';
 export * from './KeyController';
 export * from './ExplorerController';
 export * from './FilesController';
+export * from './ShortenerController';

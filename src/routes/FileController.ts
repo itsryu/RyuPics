@@ -4,6 +4,7 @@ import { mkdir } from 'node:fs/promises';
 import { join } from 'node:path';
 import { JSONResponse, RouteStructure } from '../structs/RouteStructure';
 import { RyuPics } from '../server';
+import { FileDocument } from '../types/MongoInterfaces';
 
 const existsAsync = promisify(require('fs').exists);
 const writeFileAsync = promisify(require('fs').writeFile);
@@ -15,11 +16,16 @@ class FileController extends RouteStructure {
 
     run = async (req: Request, res: Response) => {
         const database = this.client.database.db('data');
-        const collection = database.collection('files');
+        const collection = database.collection<FileDocument>('files');
 
         try {
             const fileName = req.params.id;
-            const file = await collection.findOne({ name: fileName });
+            const file = await collection.findOne({
+                $or: [
+                    { name: fileName },
+                    { id: fileName }
+                ]
+            });
 
             if (file) {
                 const buffer = Buffer.from(file.data, 'base64');
@@ -40,7 +46,7 @@ class FileController extends RouteStructure {
                 res.locals.cacheControl = 'public, max-age=31536000';
                 res.locals.expires = new Date(Date.now() + 31536000000).toUTCString();
 
-                return res.status(200).render('file', { title: fileName, file: fileURL, uploads, date, type: fileName.split('.')[1] });
+                return res.status(200).render('file', { title: file.name, file: fileURL, uploads, date, type: file.name.split('.')[1] });
             } else {
                 return res.status(404).render('404');
             }

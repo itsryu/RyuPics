@@ -1,7 +1,7 @@
 import express, { Express, Router } from 'express';
 import multer, { Multer, StorageEngine } from 'multer';
 import { MongoClient, ServerApiVersion } from 'mongodb';
-import { FilesController, HealthCheckController, HomeController, ExplorerController, FileController, UploaderController, KeyController, InfoMiddleware, DeleteFileController, NotFoundController } from './routes';
+import { FilesController, HealthCheckController, HomeController, ExplorerController, FileController, UploaderController, KeyController, InfoMiddleware, DeleteFileController, NotFoundController, ShortenerController } from './routes';
 import { config } from 'dotenv';
 import { Route } from './types/HTTPInterfaces';
 import { Logger, Util } from './utils/util';
@@ -52,23 +52,22 @@ export class RyuPics {
 
         routes.forEach((route) => {
             const { method, path, handler } = route;
+            const infoMiddleware = new InfoMiddleware(this).run;
 
             switch (method) {
-                case 'GET': {
-                    return router.get(path, new InfoMiddleware(this).run, handler.run);
-                }
-                case 'POST': {
-                    if (path.includes('/upload')) {
-                        return router.post(path, new InfoMiddleware(this).run, new KeyController(this).run, this.multer.single('file'), handler.run);
-                    } else if (path.includes('/explorer')) {
-                        return router.all(path, new InfoMiddleware(this).run, handler.run);
-                    } else {
-                        return router.post(path, new InfoMiddleware(this).run, handler.run);
-                    }
-                }
-                default: {
+                case 'GET':
+                    router.get(path, infoMiddleware, handler.run);
                     break;
-                }
+                case 'POST':
+                    const upload = path.includes('/upload');
+                    const shorten = path.includes('/shorten');
+                    const explorer = path.includes('/explorer');
+
+                    router.post(path, infoMiddleware, ...(upload || shorten ? [new KeyController(this).run, this.multer.single('file')] : []), handler.run);
+                    if (!upload && explorer) router.all(path, infoMiddleware, handler.run);
+                    break;
+                default:
+                    break;
             }
         });
 
@@ -81,11 +80,13 @@ export class RyuPics {
         const routes: Array<Route> = [
             { method: 'GET', path: '/', handler: new HomeController(this) },
             { method: 'GET', path: '/health', handler: new HealthCheckController(this) },
+            { method: 'GET', path: '/:id', handler: new FileController(this)},
             { method: 'GET', path: '/file/:id', handler: new FileController(this) },
             { method: 'GET', path: '/files', handler: new FilesController(this) },
             { method: 'POST', path: '/explorer', handler: new ExplorerController(this) },
             { method: 'POST', path: '/delete/:id', handler: new DeleteFileController(this) },
-            { method: 'POST', path: '/upload', handler: new UploaderController(this) }
+            { method: 'POST', path: '/upload', handler: new UploaderController(this) },
+            { method: 'POST', path: '/shorten', handler: new ShortenerController(this) }
         ];
 
         return routes;
@@ -98,7 +99,7 @@ export class RyuPics {
 
         try {
             await this.database.db('admin').command({ ping: 1 });
-            
+
             this.logger.success('Pinged your deployment. Successfully connected to MongoDB!', 'MongoDB');
         } catch (err) {
             this.logger.error('Failed to ping your deployment. Please check your connection string. Error: ' + err, 'MongoDB');

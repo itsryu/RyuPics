@@ -32,7 +32,8 @@ class UploaderController extends RouteStructure {
                         size: fileSize,
                         date: Date.now(),
                         contentType: req.file?.mimetype,
-                        data: req.file?.buffer.toString('base64')
+                        data: req.file?.buffer.toString('base64'),
+                        id: this.client.utils.generateShortId()
                     })
                         .then(() => this.client.logger.success(`Successfully uploaded ${req.file?.originalname} to the database.`, UploaderController.name))
                         .catch((err) => this.client.logger.error(`Failed to upload ${req.file?.originalname} to the database. Error: ${err}`, UploaderController.name));

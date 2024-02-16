@@ -1,5 +1,5 @@
 class Util {
-    formatFileSize(bytes: number): number {
+    public formatFileSize(bytes: number): number {
         if (bytes < 1024) {
             return bytes;
         } else if (bytes < 1024 * 1024) {
@@ -8,6 +8,18 @@ class Util {
             return (bytes / (1024 * 1024));
         }
     }
+
+    public generateShortId(): string {
+        const characters = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+        
+        let shortId = '';
+        for (let i = 0; i < 6; i++) {
+            const randomIndex = Math.floor(Math.random() * characters.length);
+            shortId += characters[randomIndex];
+        }
+        return shortId;
+    };
+    
 }
 
 class Logger {

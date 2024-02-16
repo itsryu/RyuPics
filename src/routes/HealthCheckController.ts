@@ -16,7 +16,6 @@ class HealthCheckController extends RouteStructure {
 
             return res.status(500).json(new JSONResponse(500, 'Internal Server Error').toJSON());
         }
-
     };
 }
 
