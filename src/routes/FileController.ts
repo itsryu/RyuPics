@@ -35,7 +35,7 @@ class FileController extends RouteStructure {
                     : `${process.env.DOMAIN_URL}/.temp/${fileName}`;
 
                 const uploads = await collection.countDocuments();
-                const date = new Date().toISOString();
+                const date = new Date(file.date).toISOString();
 
                 res.locals.cacheControl = 'public, max-age=31536000';
                 res.locals.expires = new Date(Date.now() + 31536000000).toUTCString();
