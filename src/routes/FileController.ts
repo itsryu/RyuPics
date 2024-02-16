@@ -35,11 +35,12 @@ class FileController extends RouteStructure {
                     : `${process.env.DOMAIN_URL}/.temp/${fileName}`;
 
                 const uploads = await collection.countDocuments();
+                const date = new Date().toISOString();
 
                 res.locals.cacheControl = 'public, max-age=31536000';
                 res.locals.expires = new Date(Date.now() + 31536000000).toUTCString();
 
-                return res.status(200).render('file', { title: fileName, file: fileURL, uploads, date: Date.now(), type: fileName.split('.')[1] });
+                return res.status(200).render('file', { title: fileName, file: fileURL, uploads, date, type: fileName.split('.')[1] });
             } else {
                 return res.status(404).render('404');
             }
