@@ -46,7 +46,7 @@ class FileController extends RouteStructure {
                 res.locals.cacheControl = 'public, max-age=31536000';
                 res.locals.expires = new Date(Date.now() + 31536000000).toUTCString();
 
-                return res.status(200).render('file', { title: fileName, file: fileURL, uploads, date, type: file.name.split('.')[1] });
+                return res.status(200).render('file', { title: file.name, file: fileURL, uploads, date, type: file.name.split('.')[1] });
             } else {
                 return res.status(404).render('404');
             }
