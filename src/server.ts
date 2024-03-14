@@ -52,19 +52,19 @@ export class RyuPics {
 
         routes.forEach((route) => {
             const { method, path, handler } = route;
-            const infoMiddleware = new InfoMiddleware(this).run;
+            const infoMiddleware = new InfoMiddleware(this);
 
             switch (method) {
                 case 'GET':
-                    router.get(path, infoMiddleware, handler.run);
+                    router.get(path, infoMiddleware.run, handler.run);
                     break;
                 case 'POST':
                     const upload = path.includes('/upload');
                     const shorten = path.includes('/shorten');
                     const explorer = path.includes('/explorer');
 
-                    router.post(path, infoMiddleware, ...(upload || shorten ? [new KeyController(this).run, this.multer.single('file')] : []), handler.run);
-                    if (!upload && explorer) router.all(path, infoMiddleware, handler.run);
+                    router.post(path, infoMiddleware.run, ...(upload ? [new KeyController(this).run, this.multer.single('file')] : shorten ? [new KeyController(this).run] : []), handler.run);
+                    if (!upload && explorer) router.all(path, infoMiddleware.run, handler.run);
                     break;
                 default:
                     break;
@@ -80,13 +80,13 @@ export class RyuPics {
         const routes: Array<Route> = [
             { method: 'GET', path: '/', handler: new HomeController(this) },
             { method: 'GET', path: '/health', handler: new HealthCheckController(this) },
-            { method: 'GET', path: '/:id', handler: new FileController(this)},
             { method: 'GET', path: '/file/:id', handler: new FileController(this) },
             { method: 'GET', path: '/files', handler: new FilesController(this) },
             { method: 'POST', path: '/explorer', handler: new ExplorerController(this) },
             { method: 'POST', path: '/delete/:id', handler: new DeleteFileController(this) },
             { method: 'POST', path: '/upload', handler: new UploaderController(this) },
-            { method: 'POST', path: '/shorten', handler: new ShortenerController(this) }
+            { method: 'POST', path: '/shorten', handler: new ShortenerController(this) },
+            { method: 'GET', path: '/:id', handler: new FileController(this) }
         ];
 
         return routes;

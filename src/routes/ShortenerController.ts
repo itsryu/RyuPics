@@ -3,7 +3,6 @@ import { JSONResponse, RouteStructure } from '../structs/RouteStructure';
 import { RyuPics } from '../server';
 import { FileDocument } from '../types/MongoInterfaces';
 
-
 class ShortenerController extends RouteStructure {
     constructor(client: RyuPics) {
         super(client);
