@@ -10,18 +10,18 @@
   <meta name="theme-color" content="#2b2d31" />
   <meta property="og:site_name" content="📸 ✦ <%= uploads %> uploads" />
   <meta property="og:url" content="https://pics.ryuzaki.cloud/" />
-  <meta property="og:title" content="Amo a Brenda" />
+  <meta property="og:title" content="Ryuzaki" />
   <meta property="og:updated_time" content="<%= date %>" />
   <meta name="pubdate" content="<%= date %>">
 
   <% if (['webp', 'mp4', 'mov', 'webm', 'mp3', 'wav', 'ogg'].some((ext)=> title.endsWith(ext))) { %>
-    <meta property="og:type" content="video" />
-    <meta property="og:video" content="<%= file %>" />
-    <meta property="og:video:secure_url" content="<%= file %>" />
-    <meta property="og:video:type" content="video/<%= type %>" />
+  <meta property="og:type" content="video" />
+  <meta property="og:video" content="<%= file %>" />
+  <meta property="og:video:secure_url" content="<%= file %>" />
+  <meta property="og:video:type" content="video/<%= type %>" />
   <% } else { %>
-    <meta property="og:type" content="website" />
-    <meta property="og:image" content="<%= file %>" />
+  <meta property="og:type" content="website" />
+  <meta property="og:image" content="<%= file %>" />
   <% } %>
 
   <!-- Twitter Meta Tags -->
@@ -30,13 +30,13 @@
   <meta name="twitter:title" content="Ryuzaki" />
 
   <% if (['webp', 'mp4', 'mov', 'webm', 'mp3', 'wav', 'ogg'].some((ext)=> title.endsWith(ext))) { %>
-    <meta name="twitter:card" content="player" />
-    <meta name="twitter:player" content="<%= file %>" />
+  <meta name="twitter:card" content="player" />
+  <meta name="twitter:player" content="<%= file %>" />
   <% } else { %>
-    <meta name="twitter:card" content="summary_large_image" /> 
-    <meta name="twitter:image" content="<%= file %>" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:image" content="<%= file %>" />
   <% } %>
-  
+
   <link rel="stylesheet" href="/css/file.css" />
 
   <title>
@@ -47,17 +47,17 @@
 <body>
   <div class="zoom-container" id="zoom-target">
     <% if (['webp', 'mp4' , 'mov' , 'webm' , 'mp3' , 'wav' , 'ogg' ].some((ext)=> title.endsWith(ext))) { %>
-      <video controls >
-        <source src="<%= file %>" type="video/<%= type %>">
-        Your browser does not support the video element.
-      </video>
+    <video controls>
+      <source src="<%= file %>" type="video/<%= type %>">
+      Your browser does not support the video element.
+    </video>
     <% } else if (['png', 'jpg' , 'jpeg' , 'gif' ].some((ext)=> title.endsWith(ext))) { %>
-      <img src="<%= file %>" alt="<%= title %>" />
+    <img src="<%= file %>" alt="<%= title %>" />
     <% } %>
   </div>
 
   <script>
-    document.addEventListener("DOMContentLoaded", function () {
+    document.addEventListener("DOMContentLoaded", function() {
       if (window.innerWidth > 768) {
         const zoomContainer = document.getElementById("zoom-target");
         const zoomedImage = document.querySelector("img");
@@ -76,7 +76,10 @@
 
         function panImage(e) {
           if (isZoomed) {
-            const { clientX, clientY } = e;
+            const {
+              clientX,
+              clientY
+            } = e;
             const deltaX = startPanX - clientX;
             const deltaY = startPanY - clientY;
 
@@ -90,23 +93,28 @@
             zoomedImage.style.transformOrigin = "";
             zoomedImage.style.transform = "";
           } else {
-            const { width, height } = zoomedImage.getBoundingClientRect();
+            const {
+              width,
+              height
+            } = zoomedImage.getBoundingClientRect();
 
             startPanX = (width - zoomContainer.clientWidth) / 2;
             startPanY = (height - zoomContainer.clientHeight) / 2;
           }
         }
 
-        window.addEventListener("beforeunload", function () {
+        window.addEventListener("beforeunload", function() {
           const fileName = "<%- title %>";
 
           fetch(`/delete/${fileName}`, {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ fileName }),
-          })
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                fileName
+              }),
+            })
             .then((response) => response.text());
         });
       }
