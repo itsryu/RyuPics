@@ -10,31 +10,31 @@
   <meta name="theme-color" content="#2b2d31" />
   <meta property="og:site_name" content="📸 ✦ <%= uploads %> uploads" />
   <meta property="og:url" content="https://pics.ryuzaki.cloud/" />
-  <meta property="og:title" content="Ryuzaki" />
+  <meta property="og:title" content="Ryu Gostoso" />
   <meta property="og:updated_time" content="<%= date %>" />
   <meta name="pubdate" content="<%= date %>">
 
   <% if (['webp', 'mp4', 'mov', 'webm', 'mp3', 'wav', 'ogg'].some((ext)=> title.endsWith(ext))) { %>
-  <meta property="og:type" content="video" />
-  <meta property="og:video" content="<%= file %>" />
-  <meta property="og:video:secure_url" content="<%= file %>" />
-  <meta property="og:video:type" content="video/<%= type %>" />
+    <meta property="og:type" content="video" />
+    <meta property="og:video" content="<%= file %>" />
+    <meta property="og:video:secure_url" content="<%= file %>" />
+    <meta property="og:video:type" content="video/<%= type %>" />
   <% } else { %>
-  <meta property="og:type" content="website" />
-  <meta property="og:image" content="<%= file %>" />
+    <meta property="og:type" content="website" />
+    <meta property="og:image" content="<%= file %>" />
   <% } %>
 
   <!-- Twitter Meta Tags -->
   <meta property="twitter:domain" content="https://pics.ryuzaki.cloud/" />
   <meta property="twitter:url" content="https://pics.ryuzaki.cloud/" />
-  <meta name="twitter:title" content="Ryuzaki" />
+  <meta name="twitter:title" content="Ryu Gostoso" />
 
   <% if (['webp', 'mp4', 'mov', 'webm', 'mp3', 'wav', 'ogg'].some((ext)=> title.endsWith(ext))) { %>
-  <meta name="twitter:card" content="player" />
-  <meta name="twitter:player" content="<%= file %>" />
+    <meta name="twitter:card" content="player" />
+    <meta name="twitter:player" content="<%= file %>" />
   <% } else { %>
-  <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:image" content="<%= file %>" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:image" content="<%= file %>" />
   <% } %>
 
   <link rel="stylesheet" href="/css/file.css" />
@@ -47,12 +47,12 @@
 <body>
   <div class="zoom-container" id="zoom-target">
     <% if (['webp', 'mp4' , 'mov' , 'webm' , 'mp3' , 'wav' , 'ogg' ].some((ext)=> title.endsWith(ext))) { %>
-    <video controls>
-      <source src="<%= file %>" type="video/<%= type %>">
-      Your browser does not support the video element.
-    </video>
+      <video controls>
+        <source src="<%= file %>" type="video/<%= type %>">
+        Your browser does not support the video element.
+      </video>
     <% } else if (['png', 'jpg' , 'jpeg' , 'gif' ].some((ext)=> title.endsWith(ext))) { %>
-    <img src="<%= file %>" alt="<%= title %>" />
+      <img src="<%= file %>" alt="<%= title %>" />
     <% } %>
   </div>
 

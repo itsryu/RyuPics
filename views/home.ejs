@@ -1,37 +1,40 @@
 <!doctype html>
 <html lang="pt-BR">
-  <head>
-    <meta charset="UTF-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="theme-color" content="#57ff7c" />
 
-    <link rel="manifest" href="/manifest.json" />
-    <link rel="icon" href="/favicon.ico" />
-    <link rel="apple-touch-icon" href="/logo192.png" />
-    <link rel="stylesheet" href="/css/index.css" />
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600;700;900&display=swap" />
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#57ff7c" />
 
-    <title>Pics • Ryu</title>
-  </head>
-  <body>
-    <noscript>You need to activate JavaScript to run this application.</noscript>
+  <link rel="manifest" href="/manifest.json" />
+  <link rel="icon" href="/favicon.ico" />
+  <link rel="apple-touch-icon" href="/logo192.png" />
+  <link rel="stylesheet" href="/css/index.css" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600;700;900&display=swap" />
 
-    <h1>
-      <span class="first-part">pics.</span><a href="https://ryuzaki.cloud/" target="_blank" rel="noreferrer"><span class="second-part">ryuzaki.cloud</span></a>
-    </h1>
-    
-    <canvas id="stars"></canvas>
+  <title>Pics • Ryu</title>
+</head>
 
-    <script src="https://rawgit.com/ironwallaby/delaunay/master/delaunay.js" defer async></script>
-    
-    <script>
-        const script = document.createElement('script');
+<body>
+  <noscript>You need to activate JavaScript to run this application.</noscript>
 
-        script.src = '/js/stars.js';
-        script.async = true;
+  <h1>
+    <span class="first-part">pics.</span><a href="https://ryuzaki.cloud/" target="_blank" rel="noreferrer"><span class="second-part">ryuzaki.cloud</span></a>
+  </h1>
 
-        document.body.appendChild(script);
-    </script>
-  </body>
+  <canvas id="stars"></canvas>
+
+  <script src="https://rawgit.com/ironwallaby/delaunay/master/delaunay.js" defer async></script>
+
+  <script>
+    const script = document.createElement('script');
+
+    script.src = '/js/stars.js';
+    script.async = true;
+
+    document.body.appendChild(script);
+  </script>
+</body>
+
 </html>
