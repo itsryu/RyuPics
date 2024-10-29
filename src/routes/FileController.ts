@@ -31,35 +31,26 @@ class FileController extends RouteStructure {
                 const fileType = fileName.split('.').pop();
                 const mimeType = `image/${fileType}`;
                 const readStream = this.bucket.openDownloadStreamByName(fileName);
+                const uploads =  this.bucket.find({});
+                const chunks: Buffer[] = [];
 
-                res.setHeader('Content-Type', mimeType);
-                res.setHeader('Cache-Control', 'public, max-age=31536000');
-                res.setHeader('X-Theme-Color', '#000000');
-                res.setHeader('X-OG-Site-Name', 'RyuPics');
-                res.setHeader('X-OG-URL', 'https://pics.ryuzaki.cloud/');
-                res.setHeader('X-OG-Title', 'Ryu Gostoso');
-                res.setHeader('X-OG-Updated-Time', file.uploadDate.toISOString());
-                res.setHeader('X-Pubdate', file.uploadDate.toISOString());
+                readStream.on('data', (chunk) => {
+                    chunks.push(chunk);
+                });
 
-                if (fileType && ['webp', 'mp4', 'mov', 'webm', 'mp3', 'wav', 'ogg'].includes(fileType)) {
-                    res.setHeader('X-OG-Type', 'video');
-                    res.setHeader('X-OG-Video', `https://pics.ryuzaki.cloud/files/${file.filename}`);
-                    res.setHeader('X-OG-Video-Secure-URL', `https://pics.ryuzaki.cloud/files/${file.filename}`);
-                    res.setHeader('X-OG-Video-Type', `video/${fileType}`);
-                    res.setHeader('X-Twitter-Card', 'player');
-                    res.setHeader('X-Twitter-Player', `https://pics.ryuzaki.cloud/files/${file.filename}`);
-                } else {
-                    res.setHeader('X-OG-Type', 'website');
-                    res.setHeader('X-OG-Image', `https://pics.ryuzaki.cloud/files/${file.filename}`);
-                    res.setHeader('X-Twitter-Card', 'summary_large_image');
-                    res.setHeader('X-Twitter-Image', `https://pics.ryuzaki.cloud/files/${file.filename}`);
-                }
+                readStream.on('end', () => {
+                    const buffer = Buffer.concat(chunks);
+                    const base64Image = buffer.toString('base64');
+                    const fileUrl = `data:${mimeType};base64,${base64Image}`;
 
-                res.setHeader('X-Twitter-Domain', 'https://pics.ryuzaki.cloud/');
-                res.setHeader('X-Twitter-URL', 'https://pics.ryuzaki.cloud/');
-                res.setHeader('X-Twitter-Title', 'Ryu Gostoso');
-
-                readStream.pipe(res);
+                    res.render('file', {
+                        file: fileUrl,
+                        title: file.filename,
+                        type: file.contentType ?? mimeType,
+                        date: file.uploadDate,
+                        uploads
+                    });
+                });
 
                 readStream.on('error', (err) => {
                     Logger.error((err as Error).message, FileController.name);
