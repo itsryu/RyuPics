@@ -1,10 +1,10 @@
 import express, { Express, Router } from 'express';
 import multer, { Multer, StorageEngine } from 'multer';
 import { MongoClient, ServerApiVersion } from 'mongodb';
-import { FilesController, HealthCheckController, HomeController, ExplorerController, FileController, UploaderController, KeyController, InfoMiddleware, DeleteFileController, NotFoundController, ShortenerController } from './routes';
+import { FilesController, HealthCheckController, HomeController, ExplorerController, FileController, UploaderController, KeyController, InfoMiddleware, DeleteFileController, NotFoundController, ShortenerController, FileDataController, DownloadFileController } from './routes';
 import { config } from 'dotenv';
 import { Route } from './types/HTTPInterfaces';
-import { Logger, Util } from './utils/util';
+import { Logger, Util } from './utils';
 import { join } from 'node:path';
 import cors from 'cors';
 import { json } from 'body-parser';
@@ -12,10 +12,9 @@ config({ path: './.env' });
 
 export class RyuPics {
     public readonly app: Express = express();
-    public readonly logger: Logger = new Logger();
     public readonly utils: Util = new Util();
     public readonly storage: StorageEngine = multer.memoryStorage();
-    public readonly multer: Multer = multer({ storage: this.storage });
+    public readonly uploader: Multer = multer({ storage: this.storage });
     public readonly database: MongoClient;
     public state!: string;
 
@@ -32,8 +31,8 @@ export class RyuPics {
 
         this.config();
 
-        process.on('uncaughtException', (err: Error) => this.logger.error(err.stack as string, 'uncaughtException'));
-        process.on('unhandledRejection', (err) => this.logger.error(err as string, 'unhandledRejection'));
+        process.on('uncaughtException', (err: Error) => Logger.error(err.stack as string, 'uncaughtException'));
+        process.on('unhandledRejection', (err) => Logger.error(err as string, 'unhandledRejection'));
     }
 
     private config(): void {
@@ -58,12 +57,15 @@ export class RyuPics {
                 case 'GET':
                     router.get(path, infoMiddleware.run, handler.run);
                     break;
+                case 'DELETE':
+                    router.delete(path, infoMiddleware.run, handler.run);
+                    break;
                 case 'POST':
                     const upload = path.includes('/upload');
                     const shorten = path.includes('/shorten');
                     const explorer = path.includes('/explorer');
 
-                    router.post(path, infoMiddleware.run, ...(upload ? [new KeyController(this).run, this.multer.single('file')] : shorten ? [new KeyController(this).run] : []), handler.run);
+                    router.post(path, infoMiddleware.run, ...(upload ? [new KeyController(this).run, this.uploader.single('file')] : shorten ? [new KeyController(this).run] : []), handler.run);
                     if (!upload && explorer) router.all(path, infoMiddleware.run, handler.run);
                     break;
                 default:
@@ -80,10 +82,12 @@ export class RyuPics {
         const routes: Array<Route> = [
             { method: 'GET', path: '/', handler: new HomeController(this) },
             { method: 'GET', path: '/health', handler: new HealthCheckController(this) },
+            { method: 'GET', path: '/file-data', handler: new FileDataController(this) },
             { method: 'GET', path: '/file/:id', handler: new FileController(this) },
+            { method: 'DELETE', path: '/delete/:id', handler: new DeleteFileController(this) },
+            { method: 'GET', path: '/download/:id', handler: new DownloadFileController(this) },
             { method: 'GET', path: '/files', handler: new FilesController(this) },
             { method: 'POST', path: '/explorer', handler: new ExplorerController(this) },
-            { method: 'POST', path: '/delete/:id', handler: new DeleteFileController(this) },
             { method: 'POST', path: '/upload', handler: new UploaderController(this) },
             { method: 'POST', path: '/shorten', handler: new ShortenerController(this) },
             { method: 'GET', path: '/:id', handler: new FileController(this) }
@@ -94,21 +98,21 @@ export class RyuPics {
 
     private async databaseConnection() {
         this.database.connect()
-            .then(() => this.logger.success('Connected to MongoDB!', 'MongoDB'))
-            .catch((err) => this.logger.error('Failed to connect to MongoDB. Please check your connection string. Error: ' + err, 'MongoDB'));
+            .then(() => Logger.success('Connected to MongoDB!', 'MongoDB'))
+            .catch((err) => Logger.error('Failed to connect to MongoDB. Please check your connection string. Error: ' + err, 'MongoDB'));
 
         try {
             await this.database.db('admin').command({ ping: 1 });
 
-            this.logger.success('Pinged your deployment. Successfully connected to MongoDB!', 'MongoDB');
+            Logger.success('Pinged your deployment. Successfully connected to MongoDB!', 'MongoDB');
         } catch (err) {
-            this.logger.error('Failed to ping your deployment. Please check your connection string. Error: ' + err, 'MongoDB');
+            Logger.error('Failed to ping your deployment. Please check your connection string. Error: ' + err, 'MongoDB');
         }
     }
 
     public async listen() {
         this.app.listen(process.env.PORT, () => {
-            this.logger.success(`Server is running at ${this.state == 'development' ? `${process.env.LOCAL_URL}:${process.env.PORT}/` : `${process.env.DOMAIN_URL}`}`, 'Server');
+            Logger.success(`Server is running at ${this.state == 'development' ? `${process.env.LOCAL_URL}:${process.env.PORT}/` : `${process.env.DOMAIN_URL}`}`, 'Server');
         });
 
         await this.databaseConnection().catch(console.dir);

@@ -45,7 +45,7 @@ class JSONResponse {
     }
 }
 
-abstract class RouteStructure<T = Request, K = Response, N = NextFunction, V = void | any> {
+abstract class RouteStructure<T = Request, K = Response, N = NextFunction, V = void | Promise<void>> {
     public readonly client: RyuPics;
 
     public constructor(client: RyuPics) {

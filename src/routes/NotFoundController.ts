@@ -1,20 +1,21 @@
-import { Request, Response } from 'express';
+import { NextFunction, Request, Response } from 'express';
 import { JSONResponse, RouteStructure } from '../structs/RouteStructure';
 import { RyuPics } from '../server';
+import { Logger } from '../utils';
 
 class NotFoundController extends RouteStructure {
     constructor(client: RyuPics) {
         super(client);
     }
 
-    run = (req: Request, res: Response) => {
+    run = (_: Request, res: Response): void => {
         try {
             return res.status(404).render('404');
         } catch (err) {
-            this.client.logger.error((err as Error).message, NotFoundController.name);
-            this.client.logger.warn((err as Error).stack as string, NotFoundController.name);
+            Logger.error((err as Error).message, NotFoundController.name);
+            Logger.warn((err as Error).stack as string, NotFoundController.name);
 
-            return res.status(500).json(new JSONResponse(500, 'Internal Server Error').toJSON());
+            return void res.status(500).json(new JSONResponse(500, 'Internal Server Error').toJSON());
         }
 
     };

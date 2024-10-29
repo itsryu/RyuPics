@@ -102,21 +102,6 @@
             startPanY = (height - zoomContainer.clientHeight) / 2;
           }
         }
-
-        window.addEventListener("beforeunload", function() {
-          const fileName = "<%- title %>";
-
-          fetch(`/delete/${fileName}`, {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify({
-                fileName
-              }),
-            })
-            .then((response) => response.text());
-        });
       }
     });
   </script>

@@ -1,33 +1,35 @@
 import { Request, Response } from 'express';
 import { JSONResponse, RouteStructure } from '../structs/RouteStructure';
 import { RyuPics } from '../server';
-import { FileDocument } from '../types/MongoInterfaces';
+import { GridFSBucket, ObjectId } from 'mongodb';
+import { Logger } from '../utils';
 
 class ShortenerController extends RouteStructure {
+    private bucket: GridFSBucket;
+
     constructor(client: RyuPics) {
         super(client);
+
+        this.bucket = new GridFSBucket(client.database.db('data'), { bucketName: 'uploads' });
     }
 
-    run = async (req: Request, res: Response) => {
-        const database = this.client.database.db('data');
-        const collection = database.collection<FileDocument>('files');
-
+    run = async (req: Request, res: Response): Promise<void> => {
         try {
             const { url } = req.body;
             const parts = url.split('/');
-            const name = parts[parts.length - 1];
-            const id = (await collection.findOne({ name }))?.id;
-
+            const id = parts[parts.length - 1] as number;
+            const file = (await this.bucket.find({ _id: new ObjectId(id) }).toArray())[0];
+            
             const URL = (this.client.state == 'development')
-                ? `${process.env.LOCAL_URL}:${process.env.PORT}/${id}`
-                : `${process.env.DOMAIN_URL}/${id}`;
+                ? `${process.env.LOCAL_URL}:${process.env.PORT}/${file._id}`
+                : `${process.env.DOMAIN_URL}/${file._id}`;
 
-            res.status(200).send(URL);
+            return void res.status(200).send(URL);
         } catch (err) {
-            this.client.logger.error((err as Error).message, ShortenerController.name);
-            this.client.logger.warn((err as Error).stack as string, ShortenerController.name);
+            Logger.error((err as Error).message, ShortenerController.name);
+            Logger.warn((err as Error).stack as string, ShortenerController.name);
 
-            return res.status(500).json(new JSONResponse(500, 'Internal Server Error').toJSON());
+            return void res.status(500).json(new JSONResponse(500, 'Internal Server Error').toJSON());
         }
     };
 }

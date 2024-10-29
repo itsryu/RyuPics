@@ -1,20 +1,21 @@
 import { Request, Response } from 'express';
 import { JSONResponse, RouteStructure } from '../structs/RouteStructure';
 import { RyuPics } from '../server';
+import { Logger } from '../utils';
 
 class HealthCheckController extends RouteStructure {
     constructor(client: RyuPics) {
         super(client);
     }
 
-    run = (req: Request, res: Response) => {
+    run = (_: Request, res: Response): void => {
         try {
-            return res.status(200).json(new JSONResponse(200, 'OK').toJSON());
+            return void res.status(200).json(new JSONResponse(200, 'OK').toJSON());
         } catch (err) {
-            this.client.logger.error((err as Error).message, HealthCheckController.name);
-            this.client.logger.warn((err as Error).stack as string, HealthCheckController.name);
+            Logger.error((err as Error).message, HealthCheckController.name);
+            Logger.warn((err as Error).stack as string, HealthCheckController.name);
 
-            return res.status(500).json(new JSONResponse(500, 'Internal Server Error').toJSON());
+            return void res.status(500).json(new JSONResponse(500, 'Internal Server Error').toJSON());
         }
     };
 }

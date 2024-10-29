@@ -7,16 +7,16 @@ class ExplorerController extends RouteStructure {
         super(client);
     }
 
-    run = (req: Request, res: Response) => {
+    run = (req: Request, res: Response): void => {
         if (req.method === 'GET') {
-            return res.status(200).render('form');
+            return void res.status(200).render('form');
         } else if (req.method === 'POST') {
             const { apiKey } = req.body;
 
             if (apiKey === process.env.AUTH_KEY) {
-                return res.status(200).render('explorer', { apiKey });
+                return void res.status(200).render('explorer', { apiKey });
             } else {
-                return res.status(401).send(`
+                return void res.status(401).send(`
                     <script>
                         alert("Invalid Authorization Key!");
                         window.location.href = '/explorer';
