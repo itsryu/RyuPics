@@ -34,30 +34,30 @@ class FileController extends RouteStructure {
 
                 res.setHeader('Content-Type', mimeType);
                 res.setHeader('Cache-Control', 'public, max-age=31536000');
-                res.setHeader('theme-color', '#000000');
-                res.setHeader('og-site_name', 'RyuPics');
-                res.setHeader('og-url', 'https://pics.ryuzaki.cloud/');
-                res.setHeader('og-title', 'Ryu Gostoso');
-                res.setHeader('og-updated_time', file.uploadDate.toISOString());
-                res.setHeader('pubdate', file.uploadDate.toISOString());
+                res.setHeader('X-Theme-Color', '#000000');
+                res.setHeader('X-OG-Site-Name', 'RyuPics');
+                res.setHeader('X-OG-URL', 'https://pics.ryuzaki.cloud/');
+                res.setHeader('X-OG-Title', 'Ryu Gostoso');
+                res.setHeader('X-OG-Updated-Time', file.uploadDate.toISOString());
+                res.setHeader('X-Pubdate', file.uploadDate.toISOString());
 
                 if (fileType && ['webp', 'mp4', 'mov', 'webm', 'mp3', 'wav', 'ogg'].includes(fileType)) {
-                    res.setHeader('og-type', 'video');
-                    res.setHeader('og-video', `https://pics.ryuzaki.cloud/files/${file.filename}`);
-                    res.setHeader('og-video-secure_url', `https://pics.ryuzaki.cloud/files/${file.filename}`);
-                    res.setHeader('og-video-type', `video/${fileType}`);
-                    res.setHeader('twitter-card', 'player');
-                    res.setHeader('twitter-player', `https://pics.ryuzaki.cloud/files/${file.filename}`);
+                    res.setHeader('X-OG-Type', 'video');
+                    res.setHeader('X-OG-Video', `https://pics.ryuzaki.cloud/files/${file.filename}`);
+                    res.setHeader('X-OG-Video-Secure-URL', `https://pics.ryuzaki.cloud/files/${file.filename}`);
+                    res.setHeader('X-OG-Video-Type', `video/${fileType}`);
+                    res.setHeader('X-Twitter-Card', 'player');
+                    res.setHeader('X-Twitter-Player', `https://pics.ryuzaki.cloud/files/${file.filename}`);
                 } else {
-                    res.setHeader('og-type', 'website');
-                    res.setHeader('og-image', `https://pics.ryuzaki.cloud/files/${file.filename}`);
-                    res.setHeader('twitter-card', 'summary_large_image');
-                    res.setHeader('twitter-image', `https://pics.ryuzaki.cloud/files/${file.filename}`);
+                    res.setHeader('X-OG-Type', 'website');
+                    res.setHeader('X-OG-Image', `https://pics.ryuzaki.cloud/files/${file.filename}`);
+                    res.setHeader('X-Twitter-Card', 'summary_large_image');
+                    res.setHeader('X-Twitter-Image', `https://pics.ryuzaki.cloud/files/${file.filename}`);
                 }
 
-                res.setHeader('twitter-domain', 'https://pics.ryuzaki.cloud/');
-                res.setHeader('twitter-url', 'https://pics.ryuzaki.cloud/');
-                res.setHeader('twitter-title', 'Ryu Gostoso');
+                res.setHeader('X-Twitter-Domain', 'https://pics.ryuzaki.cloud/');
+                res.setHeader('X-Twitter-URL', 'https://pics.ryuzaki.cloud/');
+                res.setHeader('X-Twitter-Title', 'Ryu Gostoso');
 
                 readStream.pipe(res);
 
