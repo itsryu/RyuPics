@@ -59,7 +59,7 @@
   <div class="zoom-container" id="zoom-target">
     <% if (isVideo) { %>
       <video controls preload="metadata">
-        <source src="<%= file %>" type="video/<%= type %>">
+        <source src="<%= file %>" type="<%= type %>">
         Seu navegador não suporta o elemento de vídeo.
       </video>
     <% } else if (isImage) { %>
