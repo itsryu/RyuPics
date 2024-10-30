@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from 'express';
-import { RouteStructure } from '../structs/RouteStructure';
+import { RouteStructure } from '../structs/routeStructure';
 import { RyuPics } from '../server';
 import { Logger } from '../utils';
 

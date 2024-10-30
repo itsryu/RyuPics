@@ -1,13 +1,8 @@
-import { NextFunction, Request, Response } from 'express';
-import { JSONResponse, RouteStructure } from '../structs/RouteStructure';
-import { RyuPics } from '../server';
+import { Request, Response } from 'express';
+import { JSONResponse, RouteStructure } from '../structs/routeStructure';
 import { Logger } from '../utils';
 
 class NotFoundController extends RouteStructure {
-    constructor(client: RyuPics) {
-        super(client);
-    }
-
     run = (_: Request, res: Response): void => {
         try {
             return res.status(404).render('404');

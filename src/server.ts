@@ -1,14 +1,12 @@
 import express, { Express, Router } from 'express';
 import multer, { Multer, StorageEngine } from 'multer';
-import { MongoClient, ServerApiVersion } from 'mongodb';
+import { GridFSBucket, MongoClient, ServerApiVersion } from 'mongodb';
 import { FilesController, HealthCheckController, HomeController, ExplorerController, FileController, UploaderController, KeyController, InfoMiddleware, DeleteFileController, NotFoundController, ShortenerController, FileDataController, DownloadFileController } from './routes';
-import { config } from 'dotenv';
 import { Route } from './types/HTTPInterfaces';
 import { Logger, Util } from './utils';
 import { join } from 'node:path';
 import cors from 'cors';
 import { json } from 'body-parser';
-config({ path: './.env' });
 
 export class RyuPics {
     public readonly app: Express = express();
@@ -16,6 +14,7 @@ export class RyuPics {
     public readonly storage: StorageEngine = multer.memoryStorage();
     public readonly uploader: Multer = multer({ storage: this.storage });
     public readonly database: MongoClient;
+    public readonly bucket: GridFSBucket;
     public state!: string;
 
     public constructor(state: string) {
@@ -27,6 +26,11 @@ export class RyuPics {
                 strict: true,
                 deprecationErrors: true
             }
+        });
+
+        this.bucket = new GridFSBucket(this.database.db('data'), { 
+            bucketName: 'uploads',
+            writeConcern: { w: 'majority' }
         });
 
         this.config();

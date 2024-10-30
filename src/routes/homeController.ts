@@ -1,13 +1,8 @@
 import { Request, Response } from 'express';
-import { RyuPics } from '../server';
-import { JSONResponse, RouteStructure } from '../structs/RouteStructure';
+import { JSONResponse, RouteStructure } from '../structs/routeStructure';
 import { Logger } from '../utils';
 
 class HomeController extends RouteStructure {
-    constructor(client: RyuPics) {
-        super(client);
-    }
-
     run = (_: Request, res: Response): void => {
         try {
             return void res.status(200).render('home');

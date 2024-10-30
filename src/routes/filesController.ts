@@ -1,7 +1,5 @@
 import { Request, Response } from 'express';
-import { JSONResponse, RouteStructure } from '../structs/RouteStructure';
-import { RyuPics } from '../server';
-import { GridFSBucket } from 'mongodb';
+import { JSONResponse, RouteStructure } from '../structs/routeStructure';
 import { Logger } from '../utils';
 
 interface Image {
@@ -15,14 +13,6 @@ interface Image {
 }
 
 class FilesController extends RouteStructure {
-    private bucket: GridFSBucket;
-
-    constructor(client: RyuPics) {
-        super(client);
-
-        this.bucket = new GridFSBucket(client.database.db('data'), { bucketName: 'uploads' });
-    }
-
     run = async (req: Request, res: Response): Promise<void> => {
         const auth = req.headers['authorization'];
         const [bearer, token] = auth?.length ? (auth.split(' ')) : ['Bearer', ''];
@@ -36,7 +26,7 @@ class FilesController extends RouteStructure {
             } else if (token !== process.env.AUTH_KEY) {
                 return void res.status(401).json(new JSONResponse(401, 'Unauthorized').toJSON());
             } else {
-                const files = await this.bucket.find().skip(skip).limit(pageSize).toArray();
+                const files = await this.client.bucket.find().skip(skip).limit(pageSize).toArray();
                 const images: Image[] = [];
 
                 for (const file of files) {

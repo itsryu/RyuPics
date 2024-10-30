@@ -1,24 +1,16 @@
 import { Request, Response } from 'express';
-import { JSONResponse, RouteStructure } from '../structs/RouteStructure';
+import { JSONResponse, RouteStructure } from '../structs/routeStructure';
 import { RyuPics } from '../server';
-import { GridFSBucket, ObjectId } from 'mongodb';
+import { ObjectId } from 'mongodb';
 import { Logger } from '../utils';
 
 class ShortenerController extends RouteStructure {
-    private bucket: GridFSBucket;
-
-    constructor(client: RyuPics) {
-        super(client);
-
-        this.bucket = new GridFSBucket(client.database.db('data'), { bucketName: 'uploads' });
-    }
-
     run = async (req: Request, res: Response): Promise<void> => {
         try {
             const { url } = req.body;
             const parts = url.split('/');
             const id = parts[parts.length - 1] as number;
-            const file = (await this.bucket.find({ _id: new ObjectId(id) }).toArray())[0];
+            const file = (await this.client.bucket.find({ _id: new ObjectId(id) }).toArray())[0];
             
             const URL = (this.client.state == 'development')
                 ? `${process.env.LOCAL_URL}:${process.env.PORT}/${file._id}`

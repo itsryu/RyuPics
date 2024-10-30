@@ -1,12 +1,6 @@
 import { Request, Response } from 'express';
-import { RouteStructure } from '../structs/RouteStructure';
-import { RyuPics } from '../server';
-
+import { RouteStructure } from '../structs/routeStructure';
 class ExplorerController extends RouteStructure {
-    constructor(client: RyuPics) {
-        super(client);
-    }
-
     run = (req: Request, res: Response): void => {
         if (req.method === 'GET') {
             return void res.status(200).render('form');

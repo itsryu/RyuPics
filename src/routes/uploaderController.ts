@@ -1,20 +1,9 @@
 import { Request, Response } from 'express';
-import { JSONResponse, RouteStructure } from '../structs/RouteStructure';
-import { RyuPics } from '../server';
-import { GridFSBucket } from 'mongodb';
+import { JSONResponse, RouteStructure } from '../structs/routeStructure';
 import { Readable } from 'stream';
 import { Logger } from '../utils';
 
 class UploaderController extends RouteStructure {
-    private bucket: GridFSBucket;
-
-    constructor(client: RyuPics) {
-        super(client);
-
-        const database = this.client.database.db('data');
-        this.bucket = new GridFSBucket(database, { bucketName: 'uploads' });
-    }
-
     run = async (req: Request, res: Response): Promise<void> => {
         const allowedExt = ['png', 'jpg', 'jpeg', 'gif', 'webp', 'mp4', 'mov', 'webm', 'mp3', 'wav', 'ogg'];
         const name = req.file?.originalname;
@@ -29,13 +18,13 @@ class UploaderController extends RouteStructure {
         }
 
         try {
-            const existingFiles = await this.bucket.find({ filename: name }).toArray();
+            const existingFiles = await this.client.bucket.find({ filename: name }).toArray();
             if (existingFiles.length > 0) {
                 return void res.status(400).json(new JSONResponse(400, 'Bad Request - File Already Exists').toJSON());
             }
 
             const readableFileStream = Readable.from(req.file.buffer);
-            const uploadStream = this.bucket.openUploadStream(name, {
+            const uploadStream = this.client.bucket.openUploadStream(name, {
                 contentType: req.file.mimetype,
             });
 
@@ -53,7 +42,6 @@ class UploaderController extends RouteStructure {
                     Logger.success(`Successfully uploaded ${name} with ID: ${fileId}`, UploaderController.name);
                     return res.status(200).send(URL);
                 });
-
         } catch (error) {
             Logger.error(`Failed to upload: ${(error as Error).message}`, UploaderController.name);
             res.status(500).json(new JSONResponse(500, 'Internal Server Error').toJSON());

@@ -1,13 +1,8 @@
 import { Request, Response } from 'express';
-import { JSONResponse, RouteStructure } from '../structs/RouteStructure';
-import { RyuPics } from '../server';
+import { JSONResponse, RouteStructure } from '../structs/routeStructure';
 import { Logger } from '../utils';
 
 class HealthCheckController extends RouteStructure {
-    constructor(client: RyuPics) {
-        super(client);
-    }
-
     run = (_: Request, res: Response): void => {
         try {
             return void res.status(200).json(new JSONResponse(200, 'OK').toJSON());
