@@ -3,9 +3,12 @@ import { JSONResponse, RouteStructure } from '../structs/routeStructure';
 import { Readable } from 'stream';
 import { Logger } from '../utils';
 
+const imageExtensions = ['png', 'jpg', 'jpeg', 'gif', 'bmp', 'webp'];
+const videoExtensions = ['mp4', 'mov', 'avi', 'mkv', 'webm'];
+
 class UploaderController extends RouteStructure {
     run = async (req: Request, res: Response): Promise<void> => {
-        const allowedExt = ['png', 'jpg', 'jpeg', 'gif', 'webp', 'mp4', 'mov', 'webm', 'mp3', 'wav', 'ogg'];
+        const allowedExt = [...imageExtensions, ...videoExtensions];
         const name = req.file?.originalname;
 
         if (!req.file || !name) {
@@ -13,12 +16,14 @@ class UploaderController extends RouteStructure {
         }
 
         const fileExtension = name.split('.').pop()?.toLowerCase();
+
         if (!fileExtension || !allowedExt.includes(fileExtension)) {
             return void res.status(400).json(new JSONResponse(400, 'Bad Request - Invalid File Type').toJSON());
         }
 
         try {
             const existingFiles = await this.client.bucket.find({ filename: name }).toArray();
+
             if (existingFiles.length > 0) {
                 return void res.status(400).json(new JSONResponse(400, 'Bad Request - File Already Exists').toJSON());
             }
@@ -35,9 +40,11 @@ class UploaderController extends RouteStructure {
                 })
                 .on('finish', () => {
                     const fileId = uploadStream.id;
+                    const str = '||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​|| ‌‌';
+
                     const URL = this.client.state === 'development'
-                        ? `${process.env.LOCAL_URL}:${process.env.PORT}/file/${fileId}`
-                        : `${process.env.DOMAIN_URL}/file/${fileId}`;
+                        ? `${str}${process.env.LOCAL_URL}:${process.env.PORT}/file/${fileId}`
+                        : `${str}${process.env.DOMAIN_URL}/file/${fileId}`;
 
                     Logger.success(`Successfully uploaded ${name} with ID: ${fileId}`, UploaderController.name);
                     return res.status(200).send(URL);
