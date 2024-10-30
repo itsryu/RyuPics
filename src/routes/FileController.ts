@@ -10,21 +10,22 @@ class FileController extends RouteStructure {
             let file: GridFSFile | undefined;
 
             if (ObjectId.isValid(id)) {
-                const fileId = new ObjectId(id);
-                file = (await this.client.bucket.find({ _id: fileId }).toArray())[0];
+                file = (await this.client.bucket.find({ _id: new ObjectId(id) }).toArray())[0];
             } else {
-                const fileName = id;
-                file = (await this.client.bucket.find({ filename: fileName }).toArray())[0];
+                file = (await this.client.bucket.find({ filename: id }).toArray())[0];
             }
 
             if (file) {
                 const fileName = file.filename;
                 const fileType = fileName.split('.').pop();
-                const mimeType = `image/${fileType}`;
+                const imageExtensions = ['png', 'jpg', 'jpeg', 'gif', 'bmp', 'webp'];
+                const videoExtensions = ['mp4', 'mov', 'avi', 'mkv', 'webm'];
+                const mimeType = imageExtensions.includes(fileType!) ? `image/${fileType}` : videoExtensions.includes(fileType!) ? `video/${fileType}` : 'file';
                 const uploads = (await this.client.bucket.find({}).toArray()).length;
+                const fileUrl = process.env.STATE === 'development' ? `http://localhost:${process.env.PORT}/file-data?id=${file._id}` : `https://pics.ryuzaki.cloud/file-data?id=${file._id}`;
 
                 return void res.status(200).render('file', {
-                    file: process.env.STATE === 'development' ? `http://localhost:${process.env.PORT}/file-data?id=${file._id}` : `https://pics.ryuzaki.cloud/file-data?id=${file._id}`,
+                    file: fileUrl,
                     title: file.filename,
                     type: file.contentType ?? mimeType,
                     date: file.uploadDate,

@@ -27,9 +27,11 @@
   <% if (isVideo) { %>
     <meta property="og:video" content="<%= file %>" />
     <meta property="og:video:secure_url" content="<%= file %>" />
-    <meta property="og:video:type" content="video/<%= type %>" />
+    <meta property="og:video:type" content="<%= type %>" />
   <% } else { %>
     <meta property="og:image" content="<%= file %>" />
+    <meta property="og:image:secure_url" content="<%= file %>" />
+    <meta property="og:image:type" content="<%= type %>" />
   <% } %>
 
   <!-- Twitter Meta Tags -->
@@ -39,9 +41,13 @@
   <% if (isVideo) { %>
     <meta name="twitter:card" content="player" />
     <meta name="twitter:player" content="<%= file %>" />
+    <meta name="twitter:player:stream" content="<%= file %>" />
+    <meta name="twitter:player:stream:content_type" content="<%= type %>" />
   <% } else { %>
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:image" content="<%= file %>" />
+    <meta name="twitter:image:src" content="<%= file %>" />
+    <meta name="twitter:image:alt" content="<%= title %>" />
   <% } %>
 
   <link rel="stylesheet" href="/css/file.css" />
@@ -52,7 +58,7 @@
 <body>
   <div class="zoom-container" id="zoom-target">
     <% if (isVideo) { %>
-      <video controls>
+      <video controls preload="metadata">
         <source src="<%= file %>" type="video/<%= type %>">
         Seu navegador não suporta o elemento de vídeo.
       </video>

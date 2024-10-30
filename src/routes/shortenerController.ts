@@ -1,7 +1,6 @@
 import { Request, Response } from 'express';
 import { JSONResponse, RouteStructure } from '../structs/routeStructure';
-import { RyuPics } from '../server';
-import { ObjectId } from 'mongodb';
+import { GridFSFile, ObjectId } from 'mongodb';
 import { Logger } from '../utils';
 
 class ShortenerController extends RouteStructure {
@@ -9,9 +8,16 @@ class ShortenerController extends RouteStructure {
         try {
             const { url } = req.body;
             const parts = url.split('/');
-            const id = parts[parts.length - 1] as number;
-            const file = (await this.client.bucket.find({ _id: new ObjectId(id) }).toArray())[0];
+            const id = parts[parts.length - 1];
             
+            let file: GridFSFile | undefined;
+
+            if (ObjectId.isValid(id)) {
+                file = (await this.client.bucket.find({ _id: new ObjectId(id) }).toArray())[0];
+            } else {
+                file = (await this.client.bucket.find({ filename: id }).toArray())[0];
+            }
+
             const URL = (this.client.state == 'development')
                 ? `${process.env.LOCAL_URL}:${process.env.PORT}/${file._id}`
                 : `${process.env.DOMAIN_URL}/${file._id}`;
