@@ -31,9 +31,6 @@ async function main() {
 
 async function loadFiles(page) {
     const filesArray = await getFiles(page, pageSize);
-
-    console.log(filesArray);
-
     const images = filterFilesByType(filesArray, imageExtensions, 'image');
     const videos = filterFilesByType(filesArray, videoExtensions, 'video');
 
@@ -45,7 +42,7 @@ async function loadFiles(page) {
     const objectProvider = new DevExpress.fileManagement.ObjectFileSystemProvider({ data: fileSystem });
     const customProvider = new DevExpress.fileManagement.CustomFileSystemProvider({
         getItems: pathInfo => objectProvider.getItems(pathInfo),
-        downloadItems: items => items.length === 1 ? downloadSingleFile(items[0]) : downloadMultipleFiles(items)
+        downloadItems: items => items.length === 1 ? downloadSingleFile(items[0].dataItem.dataItem.id) : downloadMultipleFiles(items)
     });
 
     initializeFileManager(customProvider);
@@ -53,18 +50,21 @@ async function loadFiles(page) {
 
 function filterFilesByType(files, extensions, typePrefix) {
     return files.filter(file => extensions.some(ext => file.name.endsWith(ext)))
-        .map(file => createFileObject(file, `${typePrefix}/${file.name.split('.').pop()}`));
+        .map((file) => createFileObject(file, `${typePrefix}/${file.name.split('.').pop()}`));
 }
 
 function createFileObject(file) {
     return {
         name: file.name,
-        data: null,
-        thumbnail: null,
+        id: file._id,
+        contentType: file.contentType,
+        url: file.url,
+        thumbnail: `https://pics.ryuzaki.cloud/file-data?id=${file._id}`,
         isDirectory: false,
         creator: "itsryu",
-        size: file.size,
-        download: `https://pics.ryuzaki.cloud/file/${file.name}`
+        size: file.length,
+        download: `https://pics.ryuzaki.cloud/download/${file.name}`,
+        lastModified: file.uploadDate
     };
 }
 
@@ -156,31 +156,22 @@ function hideLoading() {
     else console.warn("Loading panel instance not found.");
 }
 
-async function openSelectedFile(e) {
+async function openSelectedFile(element) {
     const popup = $('#photo-popup').dxPopup('instance');
-    const { name, dataItem } = e.file;
-    const fileExtension = name.split('.').pop();
-    const fileData = await loadFileData(dataItem.dataItem.name);
-
-    if (!fileData) {
-        console.error("Failed to load file data");
-        return;
-    }
+    const { name, id, contentType } = element.file.dataItem.dataItem;
 
     const contentTemplate = isFileType(name, fileExtensions.video)
-        ? `<video preload="metadata" class="photo-popup-image" controls><source src=${fileData} type="${mimeTypes[fileExtension] || 'video/mp4'}">Seu navegador não suporta o elemento de vídeo.</video>`
-        : `<img id="image" src="${fileData}" class="photo-popup-image" />`;
-
-    const file = { name, dataItem };
+        ? `<video preload="metadata" class="photo-popup-image" controls><source src="https://pics.ryuzaki.cloud/file-data?id=${name}" type="${contentType}">Seu navegador não suporta o elemento de vídeo.</video>`
+        : `<img id="image" src="https://pics.ryuzaki.cloud/file-data?id=${name}" class="photo-popup-image" />`;
 
     popup.option({
-        title: name,
+        title: `${name} (${id})`,
         contentTemplate: contentTemplate,
         toolbarItems: [
             createToolbarButton('Copy', () => copyToClipboard(`https://pics.ryuzaki.cloud/file/${name}`)),
-            createToolbarButton('Download', () => downloadSingleFile(name)),
+            createToolbarButton('Download', () => downloadSingleFile(id)),
             createToolbarButton('Delete', async () => {
-                await deleteFile(file);
+                await deleteFile(id);
                 popup.hide();
                 await loadFiles(currentPage);
             })
@@ -207,9 +198,9 @@ function createToolbarButton(text, onClick) {
     };
 }
 
-async function deleteFile(file) {
+async function deleteFile(id) {
     try {
-        const response = await fetch(`/delete/${file.name}`, {
+        const response = await fetch(`/delete/${id}`, {
             method: "DELETE",
             headers: {
                 "Content-Type": "application/json",
@@ -220,7 +211,7 @@ async function deleteFile(file) {
         if (!response.ok) throw new Error(response.statusText);
 
         DevExpress.ui.notify({
-            message: `File deleted: ${file.name}`,
+            message: `File deleted: ${id}`,
             position: { my: 'center top', at: 'center top' }
         }, 'success', 3000);
     } catch (error) {
@@ -349,6 +340,8 @@ function blobToURL(base64Data, contentType) {
 function isFileType(fileName, types) {
     return types.some(ext => fileName.endsWith(ext));
 }
+
+
 
 $(window).scroll(async () => {
     if ($(window).scrollTop() + $(window).height() == $(document).height()) {
