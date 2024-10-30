@@ -272,53 +272,50 @@ async function downloadSingleFile(name) {
         const response = await fetch(`/download/${name}`, {
             method: "GET",
             headers: {
-                "Content-Type": "application/json",
                 "Authorization": `Bearer ${key}`,
             }
         });
 
-        const blob = await response.blob();
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
+        if (!response.ok) {
+            throw new Error(`Failed to download file: ${name}`);
+        }
 
-        a.href = url;
-        a.download = name ?? 'download';
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
+        const blob = await response.blob();
+        saveAs(blob, name || 'download');
     } catch (error) {
-        console.error(`Error fetching blob for file: ${file.dataItem?.dataItem?.name}`, error);
+        console.error(`Error downloading file: ${name}`, error);
+        DevExpress.ui.notify(`Erro ao baixar o arquivo: ${name}`, "error", 3000);
     }
 }
 
 async function downloadMultipleFiles(files) {
-    const zip = new JSZip();
+    try {
+        const zip = new JSZip();
 
-    await Promise.all(files.map(async file => {
-        const name = file.dataItem?.dataItem?.name;
-
-        try {
+        const downloadPromises = files.map(async file => {
+            const name = file.dataItem?.dataItem?.name;
             const response = await fetch(`/download/${name}`, {
                 method: "GET",
                 headers: {
-                    "Content-Type": "application/json",
                     "Authorization": `Bearer ${key}`,
                 }
             });
 
-            const blob = await response.blob();
-            zip.file(file.dataItem?.dataItem?.name, blob);
-        } catch (error) {
-            console.error(`Error fetching blob for file: ${file.dataItem?.dataItem?.name}`, error);
-        }
-    }));
+            if (!response.ok) {
+                throw new Error(`Failed to download file: ${name}`);
+            }
 
-    try {
-        const content = await zip.generateAsync({ type: "blob" });
-        saveAs(content, "download.zip");
+            const blob = await response.blob();
+            zip.file(name, blob);
+        });
+
+        await Promise.all(downloadPromises);
+
+        const zipBlob = await zip.generateAsync({ type: 'blob' });
+        saveAs(zipBlob, 'files.zip');
     } catch (error) {
-        console.error("Error generating zip file:", error);
+        console.error("Error downloading multiple files", error);
+        DevExpress.ui.notify("Erro ao baixar arquivos", "error", 3000);
     }
 }
 

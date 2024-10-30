@@ -58,7 +58,7 @@ export class RyuPics {
                     router.get(path, infoMiddleware.run, handler.run);
                     break;
                 case 'DELETE':
-                    router.delete(path, infoMiddleware.run, handler.run);
+                    router.delete(path, infoMiddleware.run, new KeyController(this).run, handler.run);
                     break;
                 case 'POST':
                     const upload = path.includes('/upload');

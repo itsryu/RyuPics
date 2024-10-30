@@ -6,21 +6,29 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-  <!-- Facebook Meta Tags -->
+  <!-- Meta Tags -->
   <meta name="theme-color" content="#2b2d31" />
   <meta property="og:site_name" content="📸 ✦ <%= uploads %> uploads" />
   <meta property="og:url" content="https://pics.ryuzaki.cloud/" />
   <meta property="og:title" content="Ryu Gostoso" />
   <meta property="og:updated_time" content="<%= date %>" />
-  <meta name="pubdate" content="<%= date %>">
+  <meta name="pubdate" content="<%= date %>" />
 
-  <% if (['webp', 'mp4', 'mov', 'webm', 'mp3', 'wav', 'ogg'].some((ext)=> title.endsWith(ext))) { %>
-    <meta property="og:type" content="video" />
+  <% 
+    const videoExtensions = ['webp', 'mp4', 'mov', 'webm', 'mp3', 'wav', 'ogg'];
+    const imageExtensions = ['png', 'jpg', 'jpeg', 'gif'];
+    const isVideo = videoExtensions.some(ext => title.endsWith(ext));
+    const isImage = imageExtensions.some(ext => title.endsWith(ext));
+    const mediaType = isVideo ? 'video' : 'website';
+  %>
+
+  <!-- Open Graph Meta Tags -->
+  <meta property="og:type" content="<%= mediaType %>" />
+  <% if (isVideo) { %>
     <meta property="og:video" content="<%= file %>" />
     <meta property="og:video:secure_url" content="<%= file %>" />
     <meta property="og:video:type" content="video/<%= type %>" />
   <% } else { %>
-    <meta property="og:type" content="website" />
     <meta property="og:image" content="<%= file %>" />
   <% } %>
 
@@ -28,8 +36,7 @@
   <meta property="twitter:domain" content="https://pics.ryuzaki.cloud/" />
   <meta property="twitter:url" content="https://pics.ryuzaki.cloud/" />
   <meta name="twitter:title" content="Ryu Gostoso" />
-
-  <% if (['webp', 'mp4', 'mov', 'webm', 'mp3', 'wav', 'ogg'].some((ext)=> title.endsWith(ext))) { %>
+  <% if (isVideo) { %>
     <meta name="twitter:card" content="player" />
     <meta name="twitter:player" content="<%= file %>" />
   <% } else { %>
@@ -39,71 +46,51 @@
 
   <link rel="stylesheet" href="/css/file.css" />
 
-  <title>
-    <%= title %>
-  </title>
+  <title><%= title %></title>
 </head>
 
 <body>
   <div class="zoom-container" id="zoom-target">
-    <% if (['webp', 'mp4' , 'mov' , 'webm' , 'mp3' , 'wav' , 'ogg' ].some((ext)=> title.endsWith(ext))) { %>
+    <% if (isVideo) { %>
       <video controls>
         <source src="<%= file %>" type="video/<%= type %>">
-        Your browser does not support the video element.
+        Seu navegador não suporta o elemento de vídeo.
       </video>
-    <% } else if (['png', 'jpg' , 'jpeg' , 'gif' ].some((ext)=> title.endsWith(ext))) { %>
+    <% } else if (isImage) { %>
       <img src="<%= file %>" alt="<%= title %>" />
+    <% } else { %>
+      <p>Arquivo não suportado.</p>
     <% } %>
   </div>
 
   <script>
-    document.addEventListener("DOMContentLoaded", function() {
+    (function() {
       if (window.innerWidth > 768) {
         const zoomContainer = document.getElementById("zoom-target");
-        const zoomedImage = document.querySelector("img");
+        const zoomedImage = zoomContainer.querySelector("img");
+        if (!zoomedImage) return;
         let isZoomed = false;
-        let startPanX, startPanY;
 
-        zoomedImage.addEventListener("click", toggleZoom);
-        zoomContainer.addEventListener("mousemove", panImage);
-
-        function toggleZoom() {
+        zoomedImage.addEventListener("click", function() {
           isZoomed = !isZoomed;
-          zoomedImage.classList.toggle("zoomed", isZoomed);
-
-          resetPan();
-        }
-
-        function panImage(e) {
-          if (isZoomed) {
-            const {
-              clientX,
-              clientY
-            } = e;
-            const deltaX = startPanX - clientX;
-            const deltaY = startPanY - clientY;
-
-            zoomedImage.style.transformOrigin = `${deltaX}px ${deltaY}px`;
-            zoomedImage.style.transform = `scale(2) translate(${deltaX}px, ${deltaY}px)`;
-          }
-        }
-
-        function resetPan() {
+          this.classList.toggle("zoomed", isZoomed);
           if (!isZoomed) {
-            zoomedImage.style.transformOrigin = "";
-            zoomedImage.style.transform = "";
-          } else {
-            const {
-              width,
-              height
-            } = zoomedImage.getBoundingClientRect();
-
-            startPanX = (width - zoomContainer.clientWidth) / 2;
-            startPanY = (height - zoomContainer.clientHeight) / 2;
+            this.style.transform = "";
           }
-        }
+        });
+
+        zoomContainer.addEventListener("mousemove", function(e) {
+          if (isZoomed) {
+            const rect = zoomedImage.getBoundingClientRect();
+            const offsetX = e.clientX - rect.left;
+            const offsetY = e.clientY - rect.top;
+            const percentX = (offsetX / rect.width) * 100;
+            const percentY = (offsetY / rect.height) * 100;
+            zoomedImage.style.transformOrigin = `${percentX}% ${percentY}%`;
+          }
+        });
       }
-    });
+    })();
   </script>
 </body>
 

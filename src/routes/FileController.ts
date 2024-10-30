@@ -30,33 +30,14 @@ class FileController extends RouteStructure {
                 const fileName = file.filename;
                 const fileType = fileName.split('.').pop();
                 const mimeType = `image/${fileType}`;
-                const readStream = this.bucket.openDownloadStreamByName(fileName);
-                const uploads =  this.bucket.find({});
-                const chunks: Buffer[] = [];
+                const uploads = (await this.bucket.find({}).toArray()).length;
 
-                readStream.on('data', (chunk) => {
-                    chunks.push(chunk);
-                });
-
-                readStream.on('end', () => {
-                    const buffer = Buffer.concat(chunks);
-                    const base64Image = buffer.toString('base64');
-                    const fileUrl = `data:${mimeType};base64,${base64Image}`;
-
-                    res.render('file', {
-                        file: fileUrl,
-                        title: file.filename,
-                        type: file.contentType ?? mimeType,
-                        date: file.uploadDate,
-                        uploads
-                    });
-                });
-
-                readStream.on('error', (err) => {
-                    Logger.error((err as Error).message, FileController.name);
-                    Logger.warn((err as Error).stack as string, FileController.name);
-
-                    return void res.status(500).json(new JSONResponse(500, 'Internal Server Error').toJSON());
+                return void res.status(200).render('file', {
+                    file: process.env.STATE === 'development' ? `http://localhost:${process.env.PORT}/file-data?id=${file._id}` : `https://pics.ryuzaki.cloud/file-data?id=${file._id}`,
+                    title: file.filename,
+                    type: file.contentType ?? mimeType,
+                    date: file.uploadDate,
+                    uploads
                 });
             } else {
                 return void res.status(404).json(new JSONResponse(404, 'Not Found').toJSON());
