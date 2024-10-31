@@ -22,9 +22,9 @@ class FilesController extends RouteStructure {
 
         try {
             if (bearer !== 'Bearer' || !token) {
-                return void res.status(400).json(new JSONResponse(400, 'Bad Request - Missing Token').toJSON());
+                return void res.status(400).json(new JSONResponse(res.statusCode, 'Bad Request - Missing Token').toJSON());
             } else if (token !== process.env.AUTH_KEY) {
-                return void res.status(401).json(new JSONResponse(401, 'Unauthorized').toJSON());
+                return void res.status(401).json(new JSONResponse(res.statusCode, 'Unauthorized').toJSON());
             } else {
                 const files = await this.client.bucket.find().skip(skip).limit(pageSize).toArray();
                 const images: Image[] = [];
@@ -49,13 +49,13 @@ class FilesController extends RouteStructure {
                     });
                 }
 
-                return void res.status(200).json(new JSONResponse(200, 'OK', images).toJSON());
+                return void res.status(200).json(new JSONResponse(res.statusCode, 'OK', images).toJSON());
             }
         } catch (err) {
             Logger.error((err as Error).message, FilesController.name);
             Logger.warn((err as Error).stack as string, FilesController.name);
 
-            return void res.status(500).json(new JSONResponse(500, 'Internal Server Error').toJSON());
+            return void res.status(500).json(new JSONResponse(res.statusCode, 'Internal Server Error').toJSON());
         }
     };
 }

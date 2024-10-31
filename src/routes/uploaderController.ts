@@ -11,21 +11,23 @@ class UploaderController extends RouteStructure {
         const allowedExt = [...imageExtensions, ...videoExtensions];
         const name = req.file?.originalname;
 
+        console.log(req.file);
+
         if (!req.file || !name) {
-            return void res.status(400).json(new JSONResponse(400, 'Bad Request - Missing File').toJSON());
+            return void res.status(400).json(new JSONResponse(res.statusCode, 'Bad Request - Missing File').toJSON());
         }
 
         const fileExtension = name.split('.').pop()?.toLowerCase();
 
         if (!fileExtension || !allowedExt.includes(fileExtension)) {
-            return void res.status(400).json(new JSONResponse(400, 'Bad Request - Invalid File Type').toJSON());
+            return void res.status(400).json(new JSONResponse(res.statusCode, 'Bad Request - Invalid File Type').toJSON());
         }
 
         try {
             const existingFiles = await this.client.bucket.find({ filename: name }).toArray();
 
             if (existingFiles.length > 0) {
-                return void res.status(400).json(new JSONResponse(400, 'Bad Request - File Already Exists').toJSON());
+                return void res.status(400).json(new JSONResponse(res.statusCode, 'Bad Request - File Already Exists').toJSON());
             }
 
             const readableFileStream = Readable.from(req.file.buffer);
@@ -36,7 +38,7 @@ class UploaderController extends RouteStructure {
             readableFileStream.pipe(uploadStream)
                 .on('error', (error) => {
                     Logger.error(`Upload failed: ${error.message}`, UploaderController.name);
-                    res.status(500).json(new JSONResponse(500, 'Internal Server Error').toJSON());
+                    res.status(500).json(new JSONResponse(res.statusCode, 'Internal Server Error').toJSON());
                 })
                 .on('finish', () => {
                     const fileId = uploadStream.id;
@@ -51,7 +53,7 @@ class UploaderController extends RouteStructure {
                 });
         } catch (error) {
             Logger.error(`Failed to upload: ${(error as Error).message}`, UploaderController.name);
-            res.status(500).json(new JSONResponse(500, 'Internal Server Error').toJSON());
+            res.status(500).json(new JSONResponse(res.statusCode, 'Internal Server Error').toJSON());
         }
     };
 }

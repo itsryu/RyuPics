@@ -22,23 +22,23 @@ class DeleteFileController extends RouteStructure {
                         await this.client.bucket.delete(file._id);
 
                         Logger.info(`Deleted file: ${file.filename} (${file._id})`, DeleteFileController.name);
-                        return void res.status(200).json(new JSONResponse(200, 'OK').toJSON());
+                        return void res.status(200).json(new JSONResponse(res.statusCode, 'OK').toJSON());
                     } catch (err) {
                         Logger.error((err as Error).message, DeleteFileController.name);
                         Logger.warn((err as Error).stack as string, DeleteFileController.name);
-                        return void res.status(500).json(new JSONResponse(500, 'Internal Server Error').toJSON());
+                        return void res.status(500).json(new JSONResponse(res.statusCode, 'Internal Server Error').toJSON());
                     }
                 } else {
-                    return void res.status(404).json(new JSONResponse(404, 'Not Found').toJSON());
+                    return void res.status(404).json(new JSONResponse(res.statusCode, 'Not Found').toJSON());
                 }
             } else {
-                return void res.status(400).json(new JSONResponse(400, 'Bad Request: Missing file identifier').toJSON());
+                return void res.status(400).json(new JSONResponse(res.statusCode, 'Bad Request: Missing file identifier').toJSON());
             }
         } catch (err) {
             Logger.error((err as Error).message, DeleteFileController.name);
             Logger.warn((err as Error).stack as string, DeleteFileController.name);
 
-            return void res.status(500).json(new JSONResponse(500, 'Internal Server Error').toJSON());
+            return void res.status(500).json(new JSONResponse(res.statusCode, 'Internal Server Error').toJSON());
         }
     };
 }

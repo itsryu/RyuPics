@@ -30,13 +30,13 @@ class DownloadFileController extends RouteStructure {
                     res.end();
                 });
             } else {
-                return void res.status(404).json(new JSONResponse(404, 'Not Found').toJSON());
+                return void res.status(404).json(new JSONResponse(res.statusCode, 'Not Found').toJSON());
             }
         } catch (err) {
             Logger.error((err as Error).message, DownloadFileController.name);
             Logger.warn((err as Error).stack as string, DownloadFileController.name);
 
-            return void res.status(500).json(new JSONResponse(500, 'Internal Server Error').toJSON());
+            return void res.status(500).json(new JSONResponse(res.statusCode, 'Internal Server Error').toJSON());
         }
     };
 }

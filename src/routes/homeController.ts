@@ -10,7 +10,7 @@ class HomeController extends RouteStructure {
             Logger.error((err as Error).message, HomeController.name);
             Logger.warn((err as Error).stack as string, HomeController.name);
 
-            return void res.status(500).json(new JSONResponse(500, 'Internal Server Error').toJSON());
+            return void res.status(500).json(new JSONResponse(res.statusCode, 'Internal Server Error').toJSON());
         }
     };
 }
